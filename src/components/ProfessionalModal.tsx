@@ -112,12 +112,12 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
                   <Sparkles className="h-5 w-5 text-orange-600" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-sm text-gray-700">Sobrancelhas</h4>
+                  <h4 className="font-semibold text-sm text-gray-700">Serviços Realizados</h4>
                   <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-2xl font-bold text-orange-600">{summary.sobrancelhaCount}</span>
-                    <span className="text-sm text-gray-500">serviços de sobrancelha</span>
+                    <span className="text-2xl font-bold text-orange-600">{summary.esteticaServiceCount}</span>
+                    <span className="text-sm text-gray-500">serviços</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">{summary.sobrancelhaPoints} pontos total</p>
+                  <p className="text-xs text-gray-600 mt-1">Total no período</p>
                 </div>
               </div>
             </CardContent>
@@ -130,12 +130,12 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
                   <Heart className="h-5 w-5 text-teal-600" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-sm text-gray-700">Clientes Únicas</h4>
+                  <h4 className="font-semibold text-sm text-gray-700">Percentual da Meta</h4>
                   <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-2xl font-bold text-teal-600">{summary.esteticaUniqueClients}</span>
-                    <span className="text-sm text-gray-500">clientes</span>
+                    <span className="text-2xl font-bold text-teal-600">{summary.esteticaRevenuePercentage}%</span>
+                    <span className="text-sm text-gray-500">da meta</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">{summary.esteticaClientPoints} pontos total</p>
+                  <p className="text-xs text-gray-600 mt-1">Meta: R$ 5.000,00</p>
                 </div>
               </div>
             </CardContent>
@@ -149,15 +149,15 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-rose-100 rounded-lg">
-                  <Heart className="h-5 w-5 text-rose-600" />
+                  <Sparkles className="h-5 w-5 text-rose-600" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-sm text-gray-700">Clientes Únicas</h4>
+                  <h4 className="font-semibold text-sm text-gray-700">Serviços Realizados</h4>
                   <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-2xl font-bold text-rose-600">{summary.maquiagemUniqueClients}</span>
-                    <span className="text-sm text-gray-500">clientes</span>
+                    <span className="text-2xl font-bold text-rose-600">{summary.maquiagemTotalServices}</span>
+                    <span className="text-sm text-gray-500">serviços</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">{summary.maquiagemClientPoints} pontos total</p>
+                  <p className="text-xs text-gray-600 mt-1">{summary.maquiagemTotalPoints} pontos total</p>
                 </div>
               </div>
             </CardContent>
@@ -225,7 +225,7 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
         <DialogHeader>
           <DialogTitle className="text-xl">{details.professional}</DialogTitle>
           <DialogDescription className="mt-1">
-            {displayCategory}: {details.totalServices} serviços | {details.totalPoints} pontos
+            {displayCategory}: {details.totalServices} serviços | {category === "Estetica" ? `${details.totalPoints}% da meta` : `${details.totalPoints} pontos`}
           </DialogDescription>
         </DialogHeader>
 
@@ -249,7 +249,9 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
                   <TableRow>
                     <TableHead>Serviço</TableHead>
                     <TableHead className="text-center">Quantidade</TableHead>
-                    <TableHead className="text-right">Pontos</TableHead>
+                    {category !== "Estetica" && (
+                      <TableHead className="text-right">Pontos</TableHead>
+                    )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -259,12 +261,14 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
                         <div className="font-medium">{service.name}</div>
                       </TableCell>
                       <TableCell className="text-center">{service.count}</TableCell>
-                      <TableCell className="text-right font-medium">
-                        {service.points}
-                        <span className="text-xs text-muted-foreground ml-1">
-                          ({service.pointsPerService} por serviço)
-                        </span>
-                      </TableCell>
+                      {category !== "Estetica" && (
+                        <TableCell className="text-right font-medium">
+                          {service.points}
+                          <span className="text-xs text-muted-foreground ml-1">
+                            ({service.pointsPerService} por serviço)
+                          </span>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>

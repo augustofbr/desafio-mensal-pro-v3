@@ -89,7 +89,7 @@ export default function DataRankings({
           <CardHeader>
             <CardTitle>{getCategoryDisplayName(PROF_CATEGORIES.MAQUIAGEM)}</CardTitle>
             <CardDescription>
-              Pontuação: 1 ponto por cliente única atendida por dia
+              Pontuação: 1 ponto por serviço realizado
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -116,7 +116,7 @@ export default function DataRankings({
           <CardHeader>
             <CardTitle>{getCategoryDisplayName(PROF_CATEGORIES.ESTETICA)}</CardTitle>
             <CardDescription>
-              Pontuação: Sobrancelhas (Design*) = 1,5 pontos + 1 ponto por cliente única atendida por dia
+              Ranking por percentual de faturamento (Meta: R$ 5.000)
             </CardDescription>
           </CardHeader>
           <CardContent>

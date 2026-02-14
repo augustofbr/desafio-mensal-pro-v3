@@ -18,8 +18,6 @@ export function useMaquiagemData(allServicesData: any[], categoryProfessionals: 
 
     const professionalPoints = data.reduce((acc: any, service: any) => {
       const professional = service.professional;
-      const serviceDate = service.service_date;
-      const clientName = service.client_name;
 
       if (!professional) return acc;
 
@@ -28,27 +26,21 @@ export function useMaquiagemData(allServicesData: any[], categoryProfessionals: 
           professional,
           points: 0,
           services: [],
-          clientDays: new Set(),
+          totalServices: 0
         };
       }
 
-      // Pontuação: 1 ponto por cliente único/dia (sem serviço bônus por enquanto)
-      if (clientName && clientName.trim()) {
-        const clientDayKey = `${clientName.trim()}-${serviceDate}`;
+      // Pontuação: 1 ponto por serviço realizado (sem deduplicação)
+      acc[professional].points += 1;
+      acc[professional].totalServices += 1;
 
-        if (!acc[professional].clientDays.has(clientDayKey)) {
-          acc[professional].clientDays.add(clientDayKey);
-          acc[professional].points += 1;
-
-          acc[professional].services.push({
-            date: convertDateFormat(service.service_date),
-            name: `Cliente: ${clientName}`,
-            points: 1,
-            type: 'client',
-            clientName: clientName
-          });
-        }
-      }
+      acc[professional].services.push({
+        date: convertDateFormat(service.service_date),
+        name: service.service_name || "Serviço de Maquiagem",
+        points: 1,
+        type: 'service',
+        clientName: service.client_name
+      });
 
       return acc;
     }, {});
@@ -57,7 +49,7 @@ export function useMaquiagemData(allServicesData: any[], categoryProfessionals: 
       professional: prof.professional,
       points: prof.points,
       services: prof.services,
-      uniqueClientDays: prof.clientDays.size
+      totalServices: prof.totalServices
     }));
 
     const sortedData = cleanedData.sort(

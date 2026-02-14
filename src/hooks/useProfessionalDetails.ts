@@ -5,6 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { convertDateFormat } from "@/lib/utils";
 import { useDateFilter } from "@/contexts/DateFilterContext";
 import { filterDataByDateRange } from "@/lib/dateUtils";
+import { ESTETICA_REVENUE_MINIMUM } from "@/hooks/useEsteticaData";
 
 export function useProfessionalDetails() {
   const [selectedProfessional, setSelectedProfessional] = useState<string | null>(null);
@@ -42,21 +43,12 @@ export function useProfessionalDetails() {
         const allProfessionalServices = [...filteredData];
 
         if (category) {
-          if (category === "Estetica") {
-            filteredData = filteredData.filter(service => {
-              const serviceCategory = service.category?.toLowerCase() || '';
-              return serviceCategory.includes('depilação') ||
-                     serviceCategory.includes('estética corporal') ||
-                     serviceCategory.includes('estética facial') ||
-                     serviceCategory.includes('sobrancelha');
-            });
-          } else if (category === "Cabelo") {
+          if (category === "Cabelo") {
             filteredData = filteredData.filter(service => service.category === "Tratamentos para Cabelo");
           } else if (category === "Unhas") {
             filteredData = filteredData.filter(service => service.category === "Manicure e Pedicure");
-          } else if (category === "Maquiagem") {
-            filteredData = filteredData.filter(service => service.category === "Serviços de maquiagem.");
           }
+          // Estética e Maquiagem: consideram TODOS os serviços do profissional
         }
 
         console.log(`Filtered services for ${professional} in category ${category}:`, filteredData.length);
@@ -133,65 +125,23 @@ export function useProfessionalDetails() {
             }
           });
         } else if (category === "Estetica") {
-          const professionalData = {
-            clientDays: new Set(),
-            services: [] as any[]
-          };
-
           filteredData.forEach(service => {
-            const serviceName = service.service_name || '';
-            const serviceDate = service.service_date;
-            const clientName = service.client_name;
-
-            const isSobrancelha = serviceName.toLowerCase().startsWith("design");
-            if (isSobrancelha) {
-              rawServices.push({
-                date: convertDateFormat(service.service_date),
-                name: service.service_name,
-                points: 1.5,
-                type: 'sobrancelha'
-              });
-            }
-
-            if (clientName && clientName.trim()) {
-              const clientDayKey = `${clientName.trim()}-${serviceDate}`;
-
-              if (!professionalData.clientDays.has(clientDayKey)) {
-                professionalData.clientDays.add(clientDayKey);
-                rawServices.push({
-                  date: convertDateFormat(service.service_date),
-                  name: `Cliente: ${clientName}`,
-                  points: 1,
-                  type: 'client',
-                  clientName: clientName
-                });
-              }
-            }
+            rawServices.push({
+              date: convertDateFormat(service.service_date),
+              name: service.service_name || "Serviço de Estética",
+              points: 1,
+              type: 'revenue'
+            });
           });
         } else if (category === "Maquiagem") {
-          const professionalData = {
-            clientDays: new Set(),
-            services: [] as any[]
-          };
-
           filteredData.forEach(service => {
-            const serviceDate = service.service_date;
-            const clientName = service.client_name;
-
-            if (clientName && clientName.trim()) {
-              const clientDayKey = `${clientName.trim()}-${serviceDate}`;
-
-              if (!professionalData.clientDays.has(clientDayKey)) {
-                professionalData.clientDays.add(clientDayKey);
-                rawServices.push({
-                  date: convertDateFormat(service.service_date),
-                  name: `Cliente: ${clientName}`,
-                  points: 1,
-                  type: 'client',
-                  clientName: clientName
-                });
-              }
-            }
+            rawServices.push({
+              date: convertDateFormat(service.service_date),
+              name: service.service_name || "Serviço de Maquiagem",
+              points: 1,
+              type: 'service',
+              clientName: service.client_name
+            });
           });
         } else {
           rawServices = filteredData.map(service => ({
@@ -307,89 +257,44 @@ export function useProfessionalDetails() {
 
           totalPoints = professionalData.points;
         } else if (category === "Estetica") {
-          const professionalData = {
-            clientDays: new Set(),
-            sobrancelhaServices: 0,
-            points: 0
-          };
+          let totalRevenue = 0;
 
           filteredData.forEach(service => {
-            const serviceName = service.service_name || '';
-            const serviceDate = service.service_date;
-            const clientName = service.client_name;
+            const serviceName = service.service_name || "Serviço de Estética";
+            const revenue = parseFloat(service.value) || 0;
 
-            const isSobrancelha = serviceName.toLowerCase().startsWith("design");
-            if (isSobrancelha) {
-              if (!serviceSummary[serviceName]) {
-                serviceSummary[serviceName] = {
-                  name: serviceName,
-                  count: 0,
-                  points: 0,
-                  pointsPerService: 1.5
-                };
-              }
-              serviceSummary[serviceName].count++;
-              serviceSummary[serviceName].points += 1.5;
-              professionalData.points += 1.5;
-              professionalData.sobrancelhaServices++;
+            if (!serviceSummary[serviceName]) {
+              serviceSummary[serviceName] = {
+                name: serviceName,
+                count: 0,
+                points: 0,
+                pointsPerService: 1
+              };
             }
-
-            if (clientName && clientName.trim()) {
-              const clientDayKey = `${clientName.trim()}-${serviceDate}`;
-
-              if (!professionalData.clientDays.has(clientDayKey)) {
-                professionalData.clientDays.add(clientDayKey);
-
-                const clientServiceName = `Cliente: ${clientName}`;
-                if (!serviceSummary[clientServiceName]) {
-                  serviceSummary[clientServiceName] = {
-                    name: clientServiceName,
-                    count: 0,
-                    points: 0,
-                    pointsPerService: 1
-                  };
-                }
-                serviceSummary[clientServiceName].count++;
-                serviceSummary[clientServiceName].points += 1;
-                professionalData.points += 1;
-              }
-            }
+            serviceSummary[serviceName].count++;
+            serviceSummary[serviceName].points += 1;
+            totalRevenue += revenue;
           });
 
-          totalPoints = professionalData.points;
+          const revenuePercentage = Math.round(((totalRevenue / ESTETICA_REVENUE_MINIMUM) * 100) * 10) / 10;
+          totalPoints = revenuePercentage;
         } else if (category === "Maquiagem") {
-          const professionalData = {
-            clientDays: new Set(),
-            points: 0
-          };
-
           filteredData.forEach(service => {
-            const serviceDate = service.service_date;
-            const clientName = service.client_name;
+            const serviceName = service.service_name || "Serviço de Maquiagem";
 
-            if (clientName && clientName.trim()) {
-              const clientDayKey = `${clientName.trim()}-${serviceDate}`;
-
-              if (!professionalData.clientDays.has(clientDayKey)) {
-                professionalData.clientDays.add(clientDayKey);
-
-                const clientServiceName = `Cliente: ${clientName}`;
-                if (!serviceSummary[clientServiceName]) {
-                  serviceSummary[clientServiceName] = {
-                    name: clientServiceName,
-                    count: 0,
-                    points: 0,
-                    pointsPerService: 1
-                  };
-                }
-                serviceSummary[clientServiceName].count++;
-                serviceSummary[clientServiceName].points += 1;
-                professionalData.points += 1;
-              }
+            if (!serviceSummary[serviceName]) {
+              serviceSummary[serviceName] = {
+                name: serviceName,
+                count: 0,
+                points: 0,
+                pointsPerService: 1
+              };
             }
+            serviceSummary[serviceName].count++;
+            serviceSummary[serviceName].points += 1;
           });
 
-          totalPoints = professionalData.points;
+          totalPoints = filteredData.length;
         } else {
           serviceSummary = filteredData.reduce((acc: any, service: any) => {
             const serviceName = service.service_name || "Unknown Service";
@@ -442,23 +347,17 @@ export function useProfessionalDetails() {
             manicureClientPoints: clientServices.reduce((sum: number, s: any) => sum + s.points, 0)
           };
         } else if (category === "Estetica") {
-          const sobrancelhaServices = servicesArray.filter((s: any) =>
-            s.name.toLowerCase().startsWith("design")
-          );
-          const clientServices = servicesArray.filter((s: any) => s.name.startsWith("Cliente:"));
+          const esteticaServiceCount = servicesArray.reduce((sum: number, s: any) => sum + s.count, 0);
+          const esteticaRevenuePercentage = totalPoints; // Already calculated as percentage
 
           summaryData = {
-            sobrancelhaCount: sobrancelhaServices.reduce((sum: number, s: any) => sum + s.count, 0),
-            sobrancelhaPoints: sobrancelhaServices.reduce((sum: number, s: any) => sum + s.points, 0),
-            esteticaUniqueClients: clientServices.length,
-            esteticaClientPoints: clientServices.reduce((sum: number, s: any) => sum + s.points, 0)
+            esteticaServiceCount,
+            esteticaRevenuePercentage
           };
         } else if (category === "Maquiagem") {
-          const clientServices = servicesArray.filter((s: any) => s.name.startsWith("Cliente:"));
-
           summaryData = {
-            maquiagemUniqueClients: clientServices.length,
-            maquiagemClientPoints: clientServices.reduce((sum: number, s: any) => sum + s.points, 0)
+            maquiagemTotalServices: servicesArray.reduce((sum: number, s: any) => sum + s.count, 0),
+            maquiagemTotalPoints: totalPoints
           };
         }
 

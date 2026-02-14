@@ -3,6 +3,8 @@ import { convertDateFormat } from "@/lib/utils";
 import { useDateFilter } from "@/contexts/DateFilterContext";
 import { filterDataByDateRange } from "@/lib/dateUtils";
 
+export const ESTETICA_REVENUE_MINIMUM = 5000;
+
 export function useEsteticaData(allServicesData: any[], categoryProfessionals: string[]) {
   const [esteticaData, setEsteticaData] = useState<any[]>([]);
   const { getFilteredDateRange } = useDateFilter();
@@ -16,69 +18,49 @@ export function useEsteticaData(allServicesData: any[], categoryProfessionals: s
 
     console.log("Processing estética data:", data.length, "services");
 
-    const professionalPoints = data.reduce((acc: any, service: any) => {
-      const serviceName = service.service_name || '';
+    const professionalRevenue = data.reduce((acc: any, service: any) => {
       const professional = service.professional;
-      const serviceDate = service.service_date;
-      const clientName = service.client_name;
+      const revenue = parseFloat(service.value) || 0;
 
       if (!professional) return acc;
 
       if (!acc[professional]) {
         acc[professional] = {
           professional,
-          points: 0,
+          totalRevenue: 0,
           services: [],
-          clientDays: new Set(),
-          sobrancelhaServices: 0
+          serviceCount: 0
         };
       }
 
-      // Rule 1: "Sobrancelha (Design*)" services = 1.5 points each
-      const isSobrancelha = serviceName.toLowerCase().startsWith("design");
-      if (isSobrancelha) {
-        acc[professional].points += 1.5;
-        acc[professional].sobrancelhaServices += 1;
+      acc[professional].totalRevenue += revenue;
+      acc[professional].serviceCount += 1;
 
-        acc[professional].services.push({
-          date: convertDateFormat(service.service_date),
-          name: service.service_name,
-          points: 1.5,
-          type: 'sobrancelha'
-        });
-      }
-
-      // Rule 2: Each unique client per day = 1 point
-      if (clientName && clientName.trim()) {
-        const clientDayKey = `${clientName.trim()}-${serviceDate}`;
-
-        if (!acc[professional].clientDays.has(clientDayKey)) {
-          acc[professional].clientDays.add(clientDayKey);
-          acc[professional].points += 1;
-
-          acc[professional].services.push({
-            date: convertDateFormat(service.service_date),
-            name: `Cliente: ${clientName}`,
-            points: 1,
-            type: 'client',
-            clientName: clientName
-          });
-        }
-      }
+      acc[professional].services.push({
+        date: convertDateFormat(service.service_date),
+        name: service.service_name,
+        points: 1,
+        type: 'revenue'
+      });
 
       return acc;
     }, {});
 
-    const cleanedData = Object.values(professionalPoints).map((prof: any) => ({
-      professional: prof.professional,
-      points: prof.points,
-      services: prof.services,
-      sobrancelhaServices: prof.sobrancelhaServices,
-      uniqueClientDays: prof.clientDays.size
-    }));
+    const cleanedData = Object.values(professionalRevenue).map((prof: any) => {
+      const revenuePercentage = Math.round(((prof.totalRevenue / ESTETICA_REVENUE_MINIMUM) * 100) * 10) / 10;
+
+      return {
+        professional: prof.professional,
+        totalRevenue: prof.totalRevenue,
+        revenuePercentage,
+        points: revenuePercentage,
+        services: prof.services,
+        serviceCount: prof.serviceCount
+      };
+    });
 
     const sortedData = cleanedData.sort(
-      (a: any, b: any) => b.points - a.points
+      (a: any, b: any) => b.revenuePercentage - a.revenuePercentage
     );
 
     console.log("Final processed estética data:", sortedData);

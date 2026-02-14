@@ -60,7 +60,10 @@ export default function ProfessionalRanking({
               </TableCell>
               <TableCell>{item.professional}</TableCell>
               <TableCell className="text-right font-semibold">
-                {item.points} {item.points === 1 ? "ponto" : "pontos"}
+                {item.revenuePercentage !== undefined
+                  ? `${item.revenuePercentage}% da meta`
+                  : `${item.points} ${item.points === 1 ? "ponto" : "pontos"}`
+                }
               </TableCell>
               <TableCell>
                 <Button 

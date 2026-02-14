@@ -96,6 +96,7 @@ function DashboardContent() {
         <PremiacaoPanel
           hairData={hairData}
           manicureData={manicureData}
+          esteticaData={esteticaData}
           maquiagemData={maquiagemData}
           loading={loading}
         />

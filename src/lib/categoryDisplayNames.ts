@@ -25,7 +25,7 @@ export const PROF_CATEGORY_DISPLAY_NAMES: Record<string, string> = {
 export const ENABLED_PROF_CATEGORIES: Record<string, boolean> = {
   [PROF_CATEGORIES.CABELO]: true,
   [PROF_CATEGORIES.UNHAS]: true,
-  [PROF_CATEGORIES.ESTETICA]: false,
+  [PROF_CATEGORIES.ESTETICA]: true,
   [PROF_CATEGORIES.MAQUIAGEM]: true,
 };
 
