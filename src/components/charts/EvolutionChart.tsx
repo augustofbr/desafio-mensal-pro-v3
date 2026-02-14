@@ -1,11 +1,11 @@
 
 import { LineChart } from "@/components/ui/line-chart";
 import { getCurrentMonthName, groupByDay, calculateDailyAccumulated } from "@/lib/utils";
-import { getCategoryDisplayName, CATEGORIES } from "@/lib/categoryDisplayNames";
+import { getCategoryDisplayName, PROF_CATEGORIES } from "@/lib/categoryDisplayNames";
 
 interface EvolutionChartProps {
   data: any[];
-  type: 'hair' | 'manicure';
+  type: 'hair' | 'manicure' | 'maquiagem' | 'estetica';
 }
 
 export function EvolutionChart({ data, type }: EvolutionChartProps) {
@@ -127,9 +127,13 @@ export function EvolutionChart({ data, type }: EvolutionChartProps) {
   }
 
   const evolutionData = prepareEvolutionData(data);
-  const title = type === 'hair' ? 
-    `Evolução de Pontos - ${getCategoryDisplayName(CATEGORIES.HAIR_TREATMENTS)} (${currentMonth})` : 
-    `Evolução de Pontos - ${getCategoryDisplayName(CATEGORIES.MANICURE_PEDICURE)} (${currentMonth})`;
+  const categoryMap: Record<string, string> = {
+    hair: PROF_CATEGORIES.CABELO,
+    manicure: PROF_CATEGORIES.UNHAS,
+    maquiagem: PROF_CATEGORIES.MAQUIAGEM,
+    estetica: PROF_CATEGORIES.ESTETICA,
+  };
+  const title = `Evolução de Pontos - ${getCategoryDisplayName(categoryMap[type] || type)} (${currentMonth})`;
 
   return (
     <div className="h-[280px] sm:h-[320px] md:h-[350px] lg:h-[400px] mt-4 w-full overflow-hidden">

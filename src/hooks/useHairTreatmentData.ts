@@ -3,9 +3,8 @@ import { useState, useEffect } from "react";
 import { convertDateFormat } from "@/lib/utils";
 import { useDateFilter } from "@/contexts/DateFilterContext";
 import { filterDataByDateRange } from "@/lib/dateUtils";
-import { isInactiveProfessional } from "@/lib/constants";
 
-export function useHairTreatmentData(allServicesData: any[]) {
+export function useHairTreatmentData(allServicesData: any[], categoryProfessionals: string[]) {
   const [hairData, setHairData] = useState<any[]>([]);
   const { getFilteredDateRange } = useDateFilter();
 
@@ -24,9 +23,7 @@ export function useHairTreatmentData(allServicesData: any[]) {
     treatmentData.forEach((service: any) => {
       const professional = service.professional;
 
-      if (isInactiveProfessional(professional)) {
-        return;
-      }
+      if (!professional) return;
 
       if (!professionalPoints[professional]) {
         professionalPoints[professional] = {
@@ -98,24 +95,26 @@ export function useHairTreatmentData(allServicesData: any[]) {
   };
 
   useEffect(() => {
-    if (allServicesData && allServicesData.length > 0) {
-      // Get filtered date range from context
+    if (allServicesData && allServicesData.length > 0 && categoryProfessionals.length > 0) {
       const dateRange = getFilteredDateRange();
-
-      // Filter data by date range
       const filteredData = filterDataByDateRange(allServicesData, dateRange);
 
-      // Separate data by category
-      const hairTreatments = filteredData.filter(
+      // Filter services by professionals in this category
+      const categoryServices = filteredData.filter(
+        service => categoryProfessionals.includes(service.professional)
+      );
+
+      // From those, identify treatment services for bonus points
+      const hairTreatments = categoryServices.filter(
         service => service.category === "Tratamentos para Cabelo"
       );
 
-      console.log("Hair treatments found:", hairTreatments.length);
-      processHairTreatmentData(hairTreatments, filteredData);
+      console.log("Hair treatments found:", hairTreatments.length, "from", categoryProfessionals.length, "professionals");
+      processHairTreatmentData(hairTreatments, categoryServices);
     } else {
       setHairData([]);
     }
-  }, [allServicesData, getFilteredDateRange]);
+  }, [allServicesData, getFilteredDateRange, categoryProfessionals]);
 
   return hairData;
 }

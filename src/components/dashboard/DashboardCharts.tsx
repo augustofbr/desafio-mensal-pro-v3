@@ -4,44 +4,51 @@ import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCurrentMonthName } from "@/lib/utils";
 import { EvolutionChartContainer } from "@/components/charts/EvolutionChartContainer";
-import { getCategoryDisplayName, CATEGORIES, isCategoryEnabled } from "@/lib/categoryDisplayNames";
+import { getCategoryDisplayName, PROF_CATEGORIES, isCategoryEnabled } from "@/lib/categoryDisplayNames";
 
 interface DashboardChartsProps {
   hairData: any[];
   manicureData: any[];
   esteticaData: any[];
+  maquiagemData: any[];
 }
 
-export default function DashboardCharts({ hairData, manicureData, esteticaData }: DashboardChartsProps) {
+export default function DashboardCharts({ hairData, manicureData, esteticaData, maquiagemData }: DashboardChartsProps) {
   const [hasData, setHasData] = useState(false);
   const [selectedProfessionals, setSelectedProfessionals] = useState<string[]>([]);
   const currentMonth = getCurrentMonthName();
 
-  // Determinar quais tabs estão habilitadas
   const enabledTabs = [
-    isCategoryEnabled(CATEGORIES.HAIR_TREATMENTS) && { key: "hair", category: CATEGORIES.HAIR_TREATMENTS },
-    isCategoryEnabled(CATEGORIES.MANICURE_PEDICURE) && { key: "manicure", category: CATEGORIES.MANICURE_PEDICURE },
-    isCategoryEnabled(CATEGORIES.ESTETICA) && { key: "estetica", category: CATEGORIES.ESTETICA },
+    isCategoryEnabled(PROF_CATEGORIES.CABELO) && { key: "hair", category: PROF_CATEGORIES.CABELO },
+    isCategoryEnabled(PROF_CATEGORIES.UNHAS) && { key: "manicure", category: PROF_CATEGORIES.UNHAS },
+    isCategoryEnabled(PROF_CATEGORIES.MAQUIAGEM) && { key: "maquiagem", category: PROF_CATEGORIES.MAQUIAGEM },
+    isCategoryEnabled(PROF_CATEGORIES.ESTETICA) && { key: "estetica", category: PROF_CATEGORIES.ESTETICA },
   ].filter(Boolean) as { key: string; category: string }[];
 
   const [activeTab, setActiveTab] = useState(enabledTabs[0]?.key || "hair");
 
+  const getDataForTab = (tab: string) => {
+    switch (tab) {
+      case "hair": return hairData;
+      case "manicure": return manicureData;
+      case "maquiagem": return maquiagemData;
+      case "estetica": return esteticaData;
+      default: return [];
+    }
+  };
+
   useEffect(() => {
-    // Check if we have any data to display
-    if ((hairData && hairData.length > 0) || (manicureData && manicureData.length > 0) || (esteticaData && esteticaData.length > 0)) {
+    if ((hairData && hairData.length > 0) || (manicureData && manicureData.length > 0) ||
+        (esteticaData && esteticaData.length > 0) || (maquiagemData && maquiagemData.length > 0)) {
       setHasData(true);
-      // Initialize with all professionals selected
-      if (activeTab === "hair" && hairData.length > 0) {
-        setSelectedProfessionals(hairData.map(prof => prof.professional));
-      } else if (activeTab === "manicure" && manicureData.length > 0) {
-        setSelectedProfessionals(manicureData.map(prof => prof.professional));
-      } else if (activeTab === "estetica" && esteticaData.length > 0) {
-        setSelectedProfessionals(esteticaData.map(prof => prof.professional));
+      const currentData = getDataForTab(activeTab);
+      if (currentData.length > 0) {
+        setSelectedProfessionals(currentData.map(prof => prof.professional));
       }
     } else {
       setHasData(false);
     }
-  }, [hairData, manicureData, esteticaData, activeTab]);
+  }, [hairData, manicureData, esteticaData, maquiagemData, activeTab]);
 
   const toggleProfessional = (professional: string) => {
     setSelectedProfessionals(prev => {
@@ -54,7 +61,7 @@ export default function DashboardCharts({ hairData, manicureData, esteticaData }
   };
 
   const selectAllProfessionals = () => {
-    const currentData = activeTab === "hair" ? hairData : activeTab === "manicure" ? manicureData : esteticaData;
+    const currentData = getDataForTab(activeTab);
     setSelectedProfessionals(currentData.map(prof => prof.professional));
   };
 
@@ -74,6 +81,9 @@ export default function DashboardCharts({ hairData, manicureData, esteticaData }
     );
   }
 
+  const gridCols = enabledTabs.length <= 2 ? `grid-cols-${enabledTabs.length}` :
+                   enabledTabs.length === 3 ? 'grid-cols-3' : 'grid-cols-4';
+
   return (
     <Card className="w-full">
       <CardContent className="pt-6">
@@ -82,21 +92,17 @@ export default function DashboardCharts({ hairData, manicureData, esteticaData }
           <p className="text-sm text-muted-foreground text-center mb-4">
             Evolução acumulada da pontuação dos profissionais ao longo do mês de {currentMonth}
           </p>
-          
+
           <Tabs defaultValue={enabledTabs[0]?.key || "hair"} className="w-full" onValueChange={setActiveTab}>
-            <TabsList className={`grid w-full max-w-lg mx-auto mb-6 ${enabledTabs.length === 1 ? 'grid-cols-1' : enabledTabs.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
-              {isCategoryEnabled(CATEGORIES.HAIR_TREATMENTS) && (
-                <TabsTrigger value="hair">{getCategoryDisplayName(CATEGORIES.HAIR_TREATMENTS)}</TabsTrigger>
-              )}
-              {isCategoryEnabled(CATEGORIES.MANICURE_PEDICURE) && (
-                <TabsTrigger value="manicure">{getCategoryDisplayName(CATEGORIES.MANICURE_PEDICURE)}</TabsTrigger>
-              )}
-              {isCategoryEnabled(CATEGORIES.ESTETICA) && (
-                <TabsTrigger value="estetica">{getCategoryDisplayName(CATEGORIES.ESTETICA)}</TabsTrigger>
-              )}
+            <TabsList className={`grid w-full max-w-lg mx-auto mb-6 ${gridCols}`}>
+              {enabledTabs.map(tab => (
+                <TabsTrigger key={tab.key} value={tab.key}>
+                  {getCategoryDisplayName(tab.category)}
+                </TabsTrigger>
+              ))}
             </TabsList>
 
-            {isCategoryEnabled(CATEGORIES.HAIR_TREATMENTS) && (
+            {isCategoryEnabled(PROF_CATEGORIES.CABELO) && (
               <TabsContent value="hair" className="w-full">
                 <EvolutionChartContainer
                   data={hairData}
@@ -109,7 +115,7 @@ export default function DashboardCharts({ hairData, manicureData, esteticaData }
               </TabsContent>
             )}
 
-            {isCategoryEnabled(CATEGORIES.MANICURE_PEDICURE) && (
+            {isCategoryEnabled(PROF_CATEGORIES.UNHAS) && (
               <TabsContent value="manicure" className="w-full">
                 <EvolutionChartContainer
                   data={manicureData}
@@ -122,7 +128,20 @@ export default function DashboardCharts({ hairData, manicureData, esteticaData }
               </TabsContent>
             )}
 
-            {isCategoryEnabled(CATEGORIES.ESTETICA) && (
+            {isCategoryEnabled(PROF_CATEGORIES.MAQUIAGEM) && (
+              <TabsContent value="maquiagem" className="w-full">
+                <EvolutionChartContainer
+                  data={maquiagemData}
+                  type="maquiagem"
+                  selectedProfessionals={selectedProfessionals}
+                  onToggleProfessional={toggleProfessional}
+                  onSelectAll={selectAllProfessionals}
+                  onClearAll={clearAllProfessionals}
+                />
+              </TabsContent>
+            )}
+
+            {isCategoryEnabled(PROF_CATEGORIES.ESTETICA) && (
               <TabsContent value="estetica" className="w-full">
                 <EvolutionChartContainer
                   data={esteticaData}

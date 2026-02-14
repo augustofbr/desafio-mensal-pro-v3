@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart } from "@/components/ui/pie-chart";
 import { getCurrentMonthName } from "@/lib/utils";
-import { getCategoryDisplayName, CATEGORIES } from "@/lib/categoryDisplayNames";
+import { getCategoryDisplayName, PROF_CATEGORIES } from "@/lib/categoryDisplayNames";
 
 interface DistributionChartProps {
   hairData: any[];
@@ -47,7 +47,7 @@ export function DistributionChart({ hairData }: DistributionChartProps) {
       <CardHeader>
         <CardTitle>Distribuição de Pontos por Tipo</CardTitle>
         <CardDescription>
-          Proporção de pontos: Tratamentos vs Clientes Únicas na categoria {getCategoryDisplayName(CATEGORIES.HAIR_TREATMENTS)}
+          Proporção de pontos: Tratamentos vs Clientes Únicas na categoria {getCategoryDisplayName(PROF_CATEGORIES.CABELO)}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -64,7 +64,7 @@ export function DistributionChart({ hairData }: DistributionChartProps) {
                   },
                   title: {
                     display: true,
-                    text: `Distribuição de Pontos - ${getCategoryDisplayName(CATEGORIES.HAIR_TREATMENTS)} (${currentMonth})`,
+                    text: `Distribuição de Pontos - ${getCategoryDisplayName(PROF_CATEGORIES.CABELO)} (${currentMonth})`,
                   },
                 },
               }}

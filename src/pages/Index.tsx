@@ -12,14 +12,12 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { useMonthProgress } from "@/hooks/useMonthProgress";
 import { useEffect, useState } from "react";
 
-// Note: RLS is now enabled on all tables with public policies to maintain functionality
-// while providing a basic security layer. All existing operations remain fully functional.
-
 function DashboardContent() {
   const {
     hairData,
     manicureData,
     esteticaData,
+    maquiagemData,
     lastUpdate,
     lastServiceDate,
     loading,
@@ -35,7 +33,6 @@ function DashboardContent() {
   const { getFilteredDateRange } = useDateFilter();
 
   useEffect(() => {
-    // Set showDetails based on whether we have professional details
     setShowDetails(!!professionalDetails);
   }, [professionalDetails]);
 
@@ -55,7 +52,6 @@ function DashboardContent() {
       return "Período não disponível";
     }
 
-    // Convert YYYY-MM-DD to DD/MM/YYYY for display
     const formatDate = (dateStr: string) => {
       const [year, month, day] = dateStr.split('-');
       return `${day}/${month}/${year}`;
@@ -66,7 +62,6 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen p-4 md:p-8 bg-gray-50">
-      {/* Background data processors - only render once */}
       <EdgeFunctionProcessor
         refreshData={refreshData}
       />
@@ -98,21 +93,21 @@ function DashboardContent() {
           loading={loading}
         />
 
-        {/* Painel de Premiação - acima dos rankings */}
         <PremiacaoPanel
           hairData={hairData}
           manicureData={manicureData}
+          maquiagemData={maquiagemData}
           loading={loading}
         />
 
         <div className="grid grid-cols-1 gap-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Rankings Section - 1/3 width on large screens */}
             <div className="space-y-6">
               <DataRankings
                 hairData={hairData}
                 manicureData={manicureData}
                 esteticaData={esteticaData}
+                maquiagemData={maquiagemData}
                 loading={loading}
                 onSelectProfessional={handleSelectProfessional}
                 professionalDetails={professionalDetails}
@@ -122,7 +117,6 @@ function DashboardContent() {
               />
             </div>
 
-            {/* Charts Section - 2/3 width on large screens */}
             <div className="lg:col-span-2">
               {loading ? (
                 <Card className="p-6">
@@ -135,6 +129,7 @@ function DashboardContent() {
                   hairData={hairData}
                   manicureData={manicureData}
                   esteticaData={esteticaData}
+                  maquiagemData={maquiagemData}
                 />
               )}
             </div>

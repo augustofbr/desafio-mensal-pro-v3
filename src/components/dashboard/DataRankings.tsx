@@ -1,12 +1,13 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ProfessionalRanking from "@/components/ProfessionalRanking";
-import { getCategoryDisplayName, CATEGORIES, isCategoryEnabled } from "@/lib/categoryDisplayNames";
+import { getCategoryDisplayName, PROF_CATEGORIES, isCategoryEnabled } from "@/lib/categoryDisplayNames";
 
 interface DataRankingsProps {
   hairData: any[];
   manicureData: any[];
   esteticaData: any[];
+  maquiagemData: any[];
   loading: boolean;
   onSelectProfessional: (professional: string, category: string) => void;
   professionalDetails: any;
@@ -15,11 +16,12 @@ interface DataRankingsProps {
   onCloseDetails: () => void;
 }
 
-export default function DataRankings({ 
-  hairData, 
-  manicureData, 
+export default function DataRankings({
+  hairData,
+  manicureData,
   esteticaData,
-  loading, 
+  maquiagemData,
+  loading,
   onSelectProfessional,
   professionalDetails,
   selectedCategory,
@@ -28,10 +30,10 @@ export default function DataRankings({
 }: DataRankingsProps) {
   return (
     <div className="space-y-6">
-      {isCategoryEnabled(CATEGORIES.HAIR_TREATMENTS) && (
+      {isCategoryEnabled(PROF_CATEGORIES.CABELO) && (
         <Card>
           <CardHeader>
-            <CardTitle>{getCategoryDisplayName(CATEGORIES.HAIR_TREATMENTS)}</CardTitle>
+            <CardTitle>{getCategoryDisplayName(PROF_CATEGORIES.CABELO)}</CardTitle>
             <CardDescription>
               Pontuação: Tratamentos = 2 pontos + 1 ponto por cliente única atendida por dia
             </CardDescription>
@@ -44,7 +46,7 @@ export default function DataRankings({
             ) : (
               <ProfessionalRanking
                 data={hairData}
-                onSelectProfessional={(professional) => onSelectProfessional(professional, CATEGORIES.HAIR_TREATMENTS)}
+                onSelectProfessional={(professional) => onSelectProfessional(professional, PROF_CATEGORIES.CABELO)}
                 professionalDetails={professionalDetails}
                 selectedCategory={selectedCategory}
                 showDetails={showDetails}
@@ -55,10 +57,10 @@ export default function DataRankings({
         </Card>
       )}
 
-      {isCategoryEnabled(CATEGORIES.MANICURE_PEDICURE) && (
+      {isCategoryEnabled(PROF_CATEGORIES.UNHAS) && (
         <Card>
           <CardHeader>
-            <CardTitle>Manicure e Pedicure</CardTitle>
+            <CardTitle>{getCategoryDisplayName(PROF_CATEGORIES.UNHAS)}</CardTitle>
             <CardDescription>
               Pontuação: SPA dos Pés = 2 pontos + 1 ponto por cliente única atendida por dia
             </CardDescription>
@@ -71,7 +73,7 @@ export default function DataRankings({
             ) : (
               <ProfessionalRanking
                 data={manicureData}
-                onSelectProfessional={(professional) => onSelectProfessional(professional, CATEGORIES.MANICURE_PEDICURE)}
+                onSelectProfessional={(professional) => onSelectProfessional(professional, PROF_CATEGORIES.UNHAS)}
                 professionalDetails={professionalDetails}
                 selectedCategory={selectedCategory}
                 showDetails={showDetails}
@@ -82,10 +84,37 @@ export default function DataRankings({
         </Card>
       )}
 
-      {isCategoryEnabled(CATEGORIES.ESTETICA) && (
+      {isCategoryEnabled(PROF_CATEGORIES.MAQUIAGEM) && (
         <Card>
           <CardHeader>
-            <CardTitle>Estética</CardTitle>
+            <CardTitle>{getCategoryDisplayName(PROF_CATEGORIES.MAQUIAGEM)}</CardTitle>
+            <CardDescription>
+              Pontuação: 1 ponto por cliente única atendida por dia
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex justify-center items-center h-32">
+                <p className="text-gray-500 text-lg">Carregando dados...</p>
+              </div>
+            ) : (
+              <ProfessionalRanking
+                data={maquiagemData}
+                onSelectProfessional={(professional) => onSelectProfessional(professional, PROF_CATEGORIES.MAQUIAGEM)}
+                professionalDetails={professionalDetails}
+                selectedCategory={selectedCategory}
+                showDetails={showDetails}
+                onCloseDetails={onCloseDetails}
+              />
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {isCategoryEnabled(PROF_CATEGORIES.ESTETICA) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{getCategoryDisplayName(PROF_CATEGORIES.ESTETICA)}</CardTitle>
             <CardDescription>
               Pontuação: Sobrancelhas (Design*) = 1,5 pontos + 1 ponto por cliente única atendida por dia
             </CardDescription>
@@ -98,7 +127,7 @@ export default function DataRankings({
             ) : (
               <ProfessionalRanking
                 data={esteticaData}
-                onSelectProfessional={(professional) => onSelectProfessional(professional, CATEGORIES.ESTETICA)}
+                onSelectProfessional={(professional) => onSelectProfessional(professional, PROF_CATEGORIES.ESTETICA)}
                 professionalDetails={professionalDetails}
                 selectedCategory={selectedCategory}
                 showDetails={showDetails}

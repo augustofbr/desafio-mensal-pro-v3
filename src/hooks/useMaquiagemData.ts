@@ -1,25 +1,22 @@
-
 import { useState, useEffect } from "react";
 import { convertDateFormat } from "@/lib/utils";
 import { useDateFilter } from "@/contexts/DateFilterContext";
 import { filterDataByDateRange } from "@/lib/dateUtils";
 
-export function useManicurePedicureData(allServicesData: any[], categoryProfessionals: string[]) {
-  const [manicureData, setManicureData] = useState<any[]>([]);
+export function useMaquiagemData(allServicesData: any[], categoryProfessionals: string[]) {
+  const [maquiagemData, setMaquiagemData] = useState<any[]>([]);
   const { getFilteredDateRange } = useDateFilter();
 
-  const processManicurePedicureData = (data: any[]) => {
+  const processMaquiagemData = (data: any[]) => {
     if (!Array.isArray(data)) {
-      console.error("Invalid manicure data:", data);
-      setManicureData([]);
+      console.error("Invalid maquiagem data:", data);
+      setMaquiagemData([]);
       return;
     }
 
-    console.log("Processing manicure data:", data.length, "services");
+    console.log("Processing maquiagem data:", data.length, "services");
 
-    // Group by professional and calculate points with new rules
     const professionalPoints = data.reduce((acc: any, service: any) => {
-      const serviceName = service.service_name || '';
       const professional = service.professional;
       const serviceDate = service.service_date;
       const clientName = service.client_name;
@@ -32,25 +29,10 @@ export function useManicurePedicureData(allServicesData: any[], categoryProfessi
           points: 0,
           services: [],
           clientDays: new Set(),
-          spaServices: 0
         };
       }
 
-      // Rule 1: "SPA dos Pés" = 2 points each
-      const isSpaDosPes = serviceName === "SPA dos Pés";
-      if (isSpaDosPes) {
-        acc[professional].points += 2;
-        acc[professional].spaServices += 1;
-
-        acc[professional].services.push({
-          date: convertDateFormat(service.service_date),
-          name: service.service_name,
-          points: 2,
-          type: 'spa'
-        });
-      }
-
-      // Rule 2: Each unique client per day = 1 point
+      // Pontuação: 1 ponto por cliente único/dia (sem serviço bônus por enquanto)
       if (clientName && clientName.trim()) {
         const clientDayKey = `${clientName.trim()}-${serviceDate}`;
 
@@ -71,22 +53,19 @@ export function useManicurePedicureData(allServicesData: any[], categoryProfessi
       return acc;
     }, {});
 
-    // Clean up the data structure for final output (remove Set objects)
     const cleanedData = Object.values(professionalPoints).map((prof: any) => ({
       professional: prof.professional,
       points: prof.points,
       services: prof.services,
-      spaServices: prof.spaServices,
       uniqueClientDays: prof.clientDays.size
     }));
 
-    // Sort by points (descending)
     const sortedData = cleanedData.sort(
       (a: any, b: any) => b.points - a.points
     );
 
-    console.log("Final processed manicure data:", sortedData);
-    setManicureData(sortedData);
+    console.log("Final processed maquiagem data:", sortedData);
+    setMaquiagemData(sortedData);
   };
 
   useEffect(() => {
@@ -99,13 +78,13 @@ export function useManicurePedicureData(allServicesData: any[], categoryProfessi
         service => categoryProfessionals.includes(service.professional)
       );
 
-      console.log("Manicure services found:", categoryServices.length, "from", categoryProfessionals.length, "professionals");
+      console.log("Maquiagem services found:", categoryServices.length, "from", categoryProfessionals.length, "professionals");
 
-      processManicurePedicureData(categoryServices);
+      processMaquiagemData(categoryServices);
     } else {
-      setManicureData([]);
+      setMaquiagemData([]);
     }
   }, [allServicesData, getFilteredDateRange, categoryProfessionals]);
 
-  return manicureData;
+  return maquiagemData;
 }

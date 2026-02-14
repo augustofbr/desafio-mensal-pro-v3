@@ -1,11 +1,11 @@
 
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { LineChart } from "@/components/ui/line-chart";
-import { X, Scissors, Sparkles, Heart } from "lucide-react";
+import { Scissors, Sparkles, Heart } from "lucide-react";
 import { getCurrentMonthName, groupByDay, calculateDailyAccumulated } from "@/lib/utils";
+import { getCategoryDisplayName } from "@/lib/categoryDisplayNames";
 
 interface ProfessionalModalProps {
   isOpen: boolean;
@@ -22,7 +22,7 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
 
     const summary = details.summary;
 
-    if (category === "Tratamentos para Cabelo") {
+    if (category === "Cabelo") {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card className="border-blue-200">
@@ -62,7 +62,7 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
           </Card>
         </div>
       );
-    } else if (category === "Manicure e Pedicure") {
+    } else if (category === "Unhas") {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card className="border-purple-200">
@@ -82,7 +82,7 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="border-pink-200">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
@@ -102,7 +102,7 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
           </Card>
         </div>
       );
-    } else if (category === "Serviços de estética facial.") {
+    } else if (category === "Estetica") {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card className="border-orange-200">
@@ -122,7 +122,7 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="border-teal-200">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
@@ -142,6 +142,28 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
           </Card>
         </div>
       );
+    } else if (category === "Maquiagem") {
+      return (
+        <div className="grid grid-cols-1 gap-4">
+          <Card className="border-rose-200">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-rose-100 rounded-lg">
+                  <Heart className="h-5 w-5 text-rose-600" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-sm text-gray-700">Clientes Únicas</h4>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <span className="text-2xl font-bold text-rose-600">{summary.maquiagemUniqueClients}</span>
+                    <span className="text-sm text-gray-500">clientes</span>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1">{summary.maquiagemClientPoints} pontos total</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
     }
 
     return null;
@@ -149,49 +171,37 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
 
   const prepareIndividualEvolutionData = () => {
     if (!details.rawServices || details.rawServices.length === 0) {
-      return { 
-        labels: ['No data'], 
+      return {
+        labels: ['No data'],
         datasets: [{
           label: 'No data',
           data: [0],
           borderColor: 'rgb(200, 200, 200)',
           tension: 0.3,
-        }] 
+        }]
       };
     }
 
-    console.log("Raw services for individual chart:", details.rawServices);
-
-    // Get current month range to ensure we show all days up to today
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
     const today = now.getDate();
-    
-    // Create full range of dates from 1st to today
+
     const fullDateRange = [];
     for (let day = 1; day <= today; day++) {
       const date = new Date(currentYear, currentMonth, day);
-      const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+      const formattedDate = date.toISOString().split('T')[0];
       fullDateRange.push(formattedDate);
     }
 
-    // Create daily points from real service data
     const dailyPoints = groupByDay(details.rawServices);
-    
-    console.log("Daily points for individual chart:", dailyPoints);
-    
-    // Calculate accumulated points for all dates in range
     const accumulated = calculateDailyAccumulated(dailyPoints, fullDateRange);
-    
-    console.log("Accumulated points for individual chart:", accumulated);
-    
-    // Format dates for display (just the day part)
+
     const formattedDates = fullDateRange.map(date => {
       const parts = date.split('-');
       return parts.length === 3 ? parts[2] : date;
     });
-    
+
     return {
       labels: formattedDates,
       datasets: [{
@@ -207,6 +217,7 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
 
   const chartData = prepareIndividualEvolutionData();
   const currentMonth = getCurrentMonthName();
+  const displayCategory = getCategoryDisplayName(category);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -214,12 +225,11 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
         <DialogHeader>
           <DialogTitle className="text-xl">{details.professional}</DialogTitle>
           <DialogDescription className="mt-1">
-            {category}: {details.totalServices} serviços | {details.totalPoints} pontos
+            {displayCategory}: {details.totalServices} serviços | {details.totalPoints} pontos
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="mt-4 space-y-6">
-          {/* Summary Cards - First */}
           {renderSummaryCards() && (
             <div>
               <h3 className="text-lg font-semibold mb-3">Resumo da Categoria</h3>
@@ -227,7 +237,6 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
             </div>
           )}
 
-          {/* Services Table - Second */}
           <div>
             <h3 className="text-lg font-semibold mb-3">Detalhamento dos Serviços</h3>
             {details.services.length === 0 ? (
@@ -263,7 +272,6 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
             )}
           </div>
 
-          {/* Mini Evolution Chart - At the bottom */}
           <div className="w-full">
             <h3 className="text-lg font-semibold mb-3">Evolução Individual - {currentMonth}</h3>
             <div className="w-full h-[250px]">

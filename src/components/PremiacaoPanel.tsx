@@ -5,6 +5,7 @@ import { getCurrentMonthName } from "@/lib/utils";
 interface PremiacaoPanelProps {
   hairData: any[];
   manicureData: any[];
+  maquiagemData: any[];
   loading: boolean;
 }
 
@@ -14,20 +15,24 @@ const PREMIACAO_CONFIG = {
     premio: 300,
     minimoClientes: 60,
   },
-  manicure: {
-    label: "Manicure e Pedicure",
+  unhas: {
+    label: "Unhas",
     premio: 200,
     minimoClientes: 50,
   },
+  maquiagem: {
+    label: "Make",
+    premio: 200,
+    minimoClientes: 40,
+  },
 };
 
-export default function PremiacaoPanel({ hairData, manicureData, loading }: PremiacaoPanelProps) {
+export default function PremiacaoPanel({ hairData, manicureData, maquiagemData, loading }: PremiacaoPanelProps) {
   const currentMonth = getCurrentMonthName();
 
   const getCategoryWinner = (data: any[], minimoClientes: number) => {
     if (!data || data.length === 0) return null;
 
-    // Leader is the first (highest points), check if they meet minimum unique clients
     const leader = data[0];
     const uniqueClients = leader.uniqueClientDays || 0;
     const qualified = uniqueClients >= minimoClientes;
@@ -41,7 +46,8 @@ export default function PremiacaoPanel({ hairData, manicureData, loading }: Prem
   };
 
   const hairWinner = getCategoryWinner(hairData, PREMIACAO_CONFIG.cabelo.minimoClientes);
-  const manicureWinner = getCategoryWinner(manicureData, PREMIACAO_CONFIG.manicure.minimoClientes);
+  const manicureWinner = getCategoryWinner(manicureData, PREMIACAO_CONFIG.unhas.minimoClientes);
+  const maquiagemWinner = getCategoryWinner(maquiagemData, PREMIACAO_CONFIG.maquiagem.minimoClientes);
 
   if (loading) {
     return (
@@ -112,7 +118,7 @@ export default function PremiacaoPanel({ hairData, manicureData, loading }: Prem
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {renderCategoryAward(
             PREMIACAO_CONFIG.cabelo,
             hairWinner,
@@ -125,7 +131,7 @@ export default function PremiacaoPanel({ hairData, manicureData, loading }: Prem
             }
           )}
           {renderCategoryAward(
-            PREMIACAO_CONFIG.manicure,
+            PREMIACAO_CONFIG.unhas,
             manicureWinner,
             {
               bg: "bg-pink-50",
@@ -133,6 +139,17 @@ export default function PremiacaoPanel({ hairData, manicureData, loading }: Prem
               text: "text-pink-700",
               badge: "bg-pink-100 text-pink-700",
               icon: "text-pink-600",
+            }
+          )}
+          {renderCategoryAward(
+            PREMIACAO_CONFIG.maquiagem,
+            maquiagemWinner,
+            {
+              bg: "bg-rose-50",
+              border: "border-rose-200",
+              text: "text-rose-700",
+              badge: "bg-rose-100 text-rose-700",
+              icon: "text-rose-600",
             }
           )}
         </div>
