@@ -15,44 +15,81 @@ export function useHairTreatmentData(allServicesData: any[]) {
       setHairData([]);
       return;
     }
-    
-    // Group by professional and calculate points
-    const professionalPoints = data.reduce((acc: any, service: any) => {
-      const professional = service.professional;
-    if (isInactiveProfessional(professional)) {
-      return acc;
-    }
 
-      
-      if (!acc[professional]) {
-        acc[professional] = { professional, points: 0, services: [] };
+    console.log("Processing hair data:", data.length, "services");
+
+    // Group by professional and calculate points with new rules
+    const professionalPoints = data.reduce((acc: any, service: any) => {
+      const serviceName = service.service_name || '';
+      const professional = service.professional;
+      const serviceDate = service.service_date;
+      const clientName = service.client_name;
+
+      if (isInactiveProfessional(professional)) {
+        return acc;
       }
-      
-      // Check if it's a "Cronograma Capilar [pacote]" 
-      const isCapilarPackage = service.service_name && 
-                              service.service_name.includes("Cronograma Capilar") && 
-                              service.service_name.includes("pacote");
-      
-      // Add points based on the service: 5 points for Cronograma Capilar [pacote], 1 point for others
-      const pointValue = isCapilarPackage ? 5 : 1;
-      acc[professional].points += pointValue;
-      
-      // Add service to the list with standardized date format
+
+      if (!acc[professional]) {
+        acc[professional] = {
+          professional,
+          points: 0,
+          services: [],
+          // Track unique clients per day for point calculation
+          clientDays: new Set(),
+          // Track treatment services count
+          treatmentServices: 0
+        };
+      }
+
+      // Rule 1: Each service in the category = 2 points (treatment bonus)
+      acc[professional].points += 2;
+      acc[professional].treatmentServices += 1;
+
       acc[professional].services.push({
         date: convertDateFormat(service.service_date),
         name: service.service_name || "Unknown Service",
-        points: pointValue
+        points: 2,
+        type: 'treatment'
       });
-      
+
+      // Rule 2: Each unique client per day = 1 point
+      // Only count clients with valid names (not null/empty)
+      if (clientName && clientName.trim()) {
+        const clientDayKey = `${clientName.trim()}-${serviceDate}`;
+
+        // Check if this client+day combination was already counted
+        if (!acc[professional].clientDays.has(clientDayKey)) {
+          acc[professional].clientDays.add(clientDayKey);
+          acc[professional].points += 1;
+
+          acc[professional].services.push({
+            date: convertDateFormat(service.service_date),
+            name: `Cliente: ${clientName}`,
+            points: 1,
+            type: 'client',
+            clientName: clientName
+          });
+        }
+      }
+
       return acc;
     }, {});
-    
-    // Convert to array and sort by points
-    const sortedData = Object.values(professionalPoints).sort(
+
+    // Clean up the data structure for final output (remove Set objects)
+    const cleanedData = Object.values(professionalPoints).map((prof: any) => ({
+      professional: prof.professional,
+      points: prof.points,
+      services: prof.services,
+      treatmentServices: prof.treatmentServices,
+      uniqueClientDays: prof.clientDays.size
+    }));
+
+    // Sort by points (descending)
+    const sortedData = cleanedData.sort(
       (a: any, b: any) => b.points - a.points
     );
-    
-    console.log("Processed hair data:", sortedData);
+
+    console.log("Final processed hair data:", sortedData);
     setHairData(sortedData);
   };
 
@@ -60,15 +97,15 @@ export function useHairTreatmentData(allServicesData: any[]) {
     if (allServicesData && allServicesData.length > 0) {
       // Get filtered date range from context
       const dateRange = getFilteredDateRange();
-      
+
       // Filter data by date range
       const filteredData = filterDataByDateRange(allServicesData, dateRange);
-      
+
       // Separate data by category
       const hairTreatments = filteredData.filter(
         service => service.category === "Tratamentos para Cabelo"
       );
-      
+
       console.log("Hair treatments found:", hairTreatments.length);
       processHairTreatmentData(hairTreatments);
     } else {

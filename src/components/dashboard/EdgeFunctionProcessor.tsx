@@ -5,10 +5,9 @@ import { useToast } from "@/hooks/use-toast";
 
 interface EdgeFunctionProcessorProps {
   refreshData: () => void;
-  onCronogramaRefresh: () => void;
 }
 
-export function EdgeFunctionProcessor({ refreshData, onCronogramaRefresh }: EdgeFunctionProcessorProps) {
+export function EdgeFunctionProcessor({ refreshData }: EdgeFunctionProcessorProps) {
   const { toast } = useToast();
   const hasProcessed = useRef(false);
   const isProcessing = useRef(false);
@@ -49,7 +48,6 @@ export function EdgeFunctionProcessor({ refreshData, onCronogramaRefresh }: Edge
         
         // Refresh the data after processing
         refreshData();
-        onCronogramaRefresh();
       } catch (err) {
         console.error("Error processing data:", err);
         toast({

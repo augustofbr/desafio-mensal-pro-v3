@@ -29,33 +29,33 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-blue-100 rounded-lg">
-                  <Sparkles className="h-5 w-5 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-sm text-gray-700">Cronograma Capilar (pacote)</h4>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-2xl font-bold text-blue-600">{summary.cronogramaCount}</span>
-                    <span className="text-sm text-gray-500">Cronogramas</span>
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1">{summary.cronogramaPoints} pontos total</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="border-green-200">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Scissors className="h-5 w-5 text-green-600" />
+                  <Scissors className="h-5 w-5 text-blue-600" />
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-sm text-gray-700">Tratamentos</h4>
                   <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-2xl font-bold text-green-600">{summary.otherHairCount}</span>
+                    <span className="text-2xl font-bold text-blue-600">{summary.treatmentCount}</span>
                     <span className="text-sm text-gray-500">Tratamentos</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">{summary.otherHairPoints} pontos total</p>
+                  <p className="text-xs text-gray-600 mt-1">{summary.treatmentPoints} pontos total</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-green-200">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Heart className="h-5 w-5 text-green-600" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-sm text-gray-700">Clientes Únicas</h4>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <span className="text-2xl font-bold text-green-600">{summary.hairUniqueClients}</span>
+                    <span className="text-sm text-gray-500">clientes</span>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1">{summary.hairClientPoints} pontos total</p>
                 </div>
               </div>
             </CardContent>

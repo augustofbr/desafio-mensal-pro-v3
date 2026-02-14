@@ -49,23 +49,23 @@ export function useManicurePedicureData(allServicesData: any[]) {
         };
       }
       
-      // Rule 1: "SPA dos Pés" = 1.5 points each
+      // Rule 1: "SPA dos Pés" = 2 points each
       const isSpaDosPes = serviceName === "SPA dos Pés";
       if (isSpaDosPes) {
         console.log("✅ FOUND SPA dos Pes service:", {
           name: service.service_name,
           professional: service.professional
         });
-        
-        acc[professional].points += 1.5;
+
+        acc[professional].points += 2;
         acc[professional].spaServices += 1;
-        
-        console.log("Added 1.5 points for SPA dos Pés to", professional, "- total points:", acc[professional].points);
-        
+
+        console.log("Added 2 points for SPA dos Pés to", professional, "- total points:", acc[professional].points);
+
         acc[professional].services.push({
           date: convertDateFormat(service.service_date),
           name: service.service_name,
-          points: 1.5,
+          points: 2,
           type: 'spa'
         });
       }

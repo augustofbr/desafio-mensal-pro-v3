@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ProfessionalRanking from "@/components/ProfessionalRanking";
-import { getCategoryDisplayName, getServiceTypeDisplayName, CATEGORIES, isCategoryEnabled } from "@/lib/categoryDisplayNames";
+import { getCategoryDisplayName, CATEGORIES, isCategoryEnabled } from "@/lib/categoryDisplayNames";
 
 interface DataRankingsProps {
   hairData: any[];
@@ -33,7 +33,7 @@ export default function DataRankings({
           <CardHeader>
             <CardTitle>{getCategoryDisplayName(CATEGORIES.HAIR_TREATMENTS)}</CardTitle>
             <CardDescription>
-              Ranking baseado em pontuação: Cronograma Capilar (pacote) = 5 pontos, {getServiceTypeDisplayName("Outros serviços")} = 1 ponto
+              Pontuação: Tratamentos = 2 pontos + 1 ponto por cliente única atendida por dia
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -60,7 +60,7 @@ export default function DataRankings({
           <CardHeader>
             <CardTitle>Manicure e Pedicure</CardTitle>
             <CardDescription>
-              Pontuação: SPA dos Pés = 1,5 pontos + 1 ponto por cliente única atendida por dia
+              Pontuação: SPA dos Pés = 2 pontos + 1 ponto por cliente única atendida por dia
             </CardDescription>
           </CardHeader>
           <CardContent>

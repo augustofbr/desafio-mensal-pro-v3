@@ -3,10 +3,9 @@ import { Card } from "@/components/ui/card";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DataRankings from "@/components/dashboard/DataRankings";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
-import CronogramaSales from "@/components/CronogramaSales";
+import PremiacaoPanel from "@/components/PremiacaoPanel";
 import DateFilter from "@/components/DateFilter";
 import MonthProgress from "@/components/dashboard/MonthProgress";
-import { CronogramaDataProcessor } from "@/components/dashboard/CronogramaDataProcessor";
 import { EdgeFunctionProcessor } from "@/components/dashboard/EdgeFunctionProcessor";
 import { DateFilterProvider, useDateFilter } from "@/contexts/DateFilterContext";
 import { useDashboardData } from "@/hooks/useDashboardData";
@@ -17,23 +16,22 @@ import { useEffect, useState } from "react";
 // while providing a basic security layer. All existing operations remain fully functional.
 
 function DashboardContent() {
-  const { 
-    hairData, 
-    manicureData, 
+  const {
+    hairData,
+    manicureData,
     esteticaData,
-    lastUpdate, 
+    lastUpdate,
     lastServiceDate,
-    loading, 
-    refreshData, 
-    selectProfessional, 
-    professionalDetails 
+    loading,
+    refreshData,
+    selectProfessional,
+    professionalDetails
   } = useDashboardData();
-  
+
   const { workedDays, remainingDays, totalDays } = useMonthProgress();
-  
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
-  const [cronogramaData, setCronogramaData] = useState<any[]>([]);
   const { getFilteredDateRange } = useDateFilter();
 
   useEffect(() => {
@@ -51,27 +49,18 @@ function DashboardContent() {
     selectProfessional(null, null);
   };
 
-  const handleCronogramaDataProcessed = (data: any[]) => {
-    setCronogramaData(data);
-  };
-
-  const refreshCronogramaData = () => {
-    // This will trigger the CronogramaDataProcessor to refresh
-    setCronogramaData([]);
-  };
-
   const getDataPeriodFromFilter = (): string => {
     const range = getFilteredDateRange();
     if (!range.startDate || !range.endDate) {
       return "Período não disponível";
     }
-    
+
     // Convert YYYY-MM-DD to DD/MM/YYYY for display
     const formatDate = (dateStr: string) => {
       const [year, month, day] = dateStr.split('-');
       return `${day}/${month}/${year}`;
     };
-    
+
     return `De ${formatDate(range.startDate)} até ${formatDate(range.endDate)}`;
   };
 
@@ -80,37 +69,39 @@ function DashboardContent() {
       {/* Background data processors - only render once */}
       <EdgeFunctionProcessor
         refreshData={refreshData}
-        onCronogramaRefresh={refreshCronogramaData}
-      />
-      <CronogramaDataProcessor 
-        loading={loading} 
-        onDataProcessed={handleCronogramaDataProcessed}
       />
 
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col items-center mb-6">
-          <img 
-            src="/lovable-uploads/0cb6b226-2d51-4078-9b78-b6565c728721.png" 
-            alt="Studio X - Salão de Beleza & Estética" 
+          <img
+            src="/lovable-uploads/0cb6b226-2d51-4078-9b78-b6565c728721.png"
+            alt="Studio X - Salão de Beleza & Estética"
             className="h-24 md:h-28 mb-2"
           />
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 text-center">Desafio do Profissional Parceiro</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 text-center">Desafio do Profissional Parceiro - V3</h1>
           <p className="text-lg md:text-xl text-gray-600 text-center mt-2">
             {getDataPeriodFromFilter()}
           </p>
         </div>
-        
+
         <DateFilter />
-        
-        <MonthProgress 
+
+        <MonthProgress
           workedDays={workedDays}
           remainingDays={remainingDays}
           totalDays={totalDays}
           className="mb-6"
         />
-        
+
         <DashboardHeader
           lastUpdate={lastUpdate}
+          loading={loading}
+        />
+
+        {/* Painel de Premiação - acima dos rankings */}
+        <PremiacaoPanel
+          hairData={hairData}
+          manicureData={manicureData}
           loading={loading}
         />
 
@@ -118,22 +109,16 @@ function DashboardContent() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Rankings Section - 1/3 width on large screens */}
             <div className="space-y-6">
-              <DataRankings 
-                hairData={hairData} 
-                manicureData={manicureData} 
+              <DataRankings
+                hairData={hairData}
+                manicureData={manicureData}
                 esteticaData={esteticaData}
-                loading={loading} 
+                loading={loading}
                 onSelectProfessional={handleSelectProfessional}
                 professionalDetails={professionalDetails}
                 selectedCategory={selectedCategory || ""}
                 showDetails={showDetails}
                 onCloseDetails={handleCloseDetails}
-              />
-              
-              {/* Cronograma Sales Section */}
-              <CronogramaSales 
-                data={cronogramaData}
-                loading={loading}
               />
             </div>
 
@@ -146,9 +131,9 @@ function DashboardContent() {
                   </div>
                 </Card>
               ) : (
-                <DashboardCharts 
-                  hairData={hairData} 
-                  manicureData={manicureData} 
+                <DashboardCharts
+                  hairData={hairData}
+                  manicureData={manicureData}
                   esteticaData={esteticaData}
                 />
               )}

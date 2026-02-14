@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart } from "@/components/ui/pie-chart";
 import { getCurrentMonthName } from "@/lib/utils";
-import { getCategoryDisplayName, getServiceTypeDisplayName, CATEGORIES } from "@/lib/categoryDisplayNames";
+import { getCategoryDisplayName, CATEGORIES } from "@/lib/categoryDisplayNames";
 
 interface DistributionChartProps {
   hairData: any[];
@@ -10,29 +10,29 @@ interface DistributionChartProps {
 
 export function DistributionChart({ hairData }: DistributionChartProps) {
   const currentMonth = getCurrentMonthName();
-  
+
   const prepareHairPieData = () => {
-    // Count points from regular services vs Cronograma Capilar
-    let cronogramaPoints = 0;
-    let otherPoints = 0;
+    // Count points from treatments vs unique clients
+    let treatmentPoints = 0;
+    let clientPoints = 0;
 
     hairData.forEach(prof => {
       (prof.services || []).forEach((service: any) => {
-        if (service.name.includes("Cronograma Capilar") && service.name.includes("pacote")) {
-          cronogramaPoints += service.points;
-        } else {
-          otherPoints += service.points;
+        if (service.type === 'treatment') {
+          treatmentPoints += service.points;
+        } else if (service.type === 'client') {
+          clientPoints += service.points;
         }
       });
     });
 
     return {
-      labels: ['Cronograma Capilar [pacote]', getServiceTypeDisplayName('Outros Serviços')],
+      labels: ['Tratamentos', 'Clientes Únicas'],
       datasets: [
         {
-          data: [cronogramaPoints, otherPoints],
+          data: [treatmentPoints, clientPoints],
           backgroundColor: [
-            'rgba(255, 159, 64, 0.7)',
+            'rgba(53, 162, 235, 0.7)',
             'rgba(75, 192, 192, 0.7)',
           ],
         },
@@ -45,9 +45,9 @@ export function DistributionChart({ hairData }: DistributionChartProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Distribuição de Pontos por Serviço</CardTitle>
+        <CardTitle>Distribuição de Pontos por Tipo</CardTitle>
         <CardDescription>
-          Proporção de pontos por tipo de serviço na categoria {getCategoryDisplayName(CATEGORIES.HAIR_TREATMENTS)}
+          Proporção de pontos: Tratamentos vs Clientes Únicas na categoria {getCategoryDisplayName(CATEGORIES.HAIR_TREATMENTS)}
         </CardDescription>
       </CardHeader>
       <CardContent>

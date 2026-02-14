@@ -50,7 +50,7 @@ export function PerformanceCharts({ hairData, manicureData, esteticaData }: Perf
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ComparisonChart hairData={hairData} manicureData={manicureData} esteticaData={esteticaData} />
-        <DistributionChart hairData={hairData} esteticaData={esteticaData} />
+        <DistributionChart hairData={hairData} />
       </div>
     </div>
   );
