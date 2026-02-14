@@ -116,7 +116,7 @@ export default function DataRankings({
           <CardHeader>
             <CardTitle>{getCategoryDisplayName(PROF_CATEGORIES.ESTETICA)}</CardTitle>
             <CardDescription>
-              Ranking por percentual de faturamento (Meta: R$ 5.000)
+              Ranking por percentual de faturamento
             </CardDescription>
           </CardHeader>
           <CardContent>

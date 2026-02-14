@@ -109,7 +109,7 @@ export default function PremiacaoPanel({ hairData, manicureData, esteticaData, m
   ) => {
     const getMinimumLabel = () => {
       if (config.type === 'revenue') {
-        return `Meta: R$ ${config.minimo.toLocaleString('pt-BR')}`;
+        return `Meta de faturamento`;
       } else if (config.type === 'services') {
         return `Mín. ${config.minimo} serviços`;
       } else {

@@ -135,7 +135,7 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
                     <span className="text-2xl font-bold text-teal-600">{summary.esteticaRevenuePercentage}%</span>
                     <span className="text-sm text-gray-500">da meta</span>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">Meta: R$ 5.000,00</p>
+                  <p className="text-xs text-gray-600 mt-1">Meta de faturamento</p>
                 </div>
               </div>
             </CardContent>
