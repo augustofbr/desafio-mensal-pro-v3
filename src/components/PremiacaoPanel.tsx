@@ -67,7 +67,7 @@ export default function PremiacaoPanel({ hairData, manicureData, loading }: Prem
           <h4 className="font-semibold text-gray-800">{config.label}</h4>
         </div>
         <span className={`text-sm font-bold px-3 py-1 rounded-full ${colorScheme.badge}`}>
-          R$ {config.premio},00
+          Mín. {config.minimoClientes} clientes
         </span>
       </div>
 
@@ -86,7 +86,7 @@ export default function PremiacaoPanel({ hairData, manicureData, loading }: Prem
             ) : (
               <div className="flex items-center gap-1 text-amber-600">
                 <AlertCircle className="h-5 w-5" />
-                <span className="text-sm font-medium">Pendente</span>
+                <span className="text-sm font-medium">Faltam {config.minimoClientes - winner.uniqueClients} atendimentos</span>
               </div>
             )}
           </div>

@@ -1,7 +1,7 @@
 
 // List of inactive professionals who should not appear in rankings
 
-export const INACTIVE_PROFESSIONALS = ["Andressa", "Andrei", "Paula", "Karol", "Lulu", "Lucas", "Luana", "Najla", "Claudia", "Angi", "Débora", "Diane", "Betina", "Cardoso"];
+export const INACTIVE_PROFESSIONALS = ["Andressa", "Andrei", "Paula", "Karol", "Lulu", "Lucas", "Luana", "Najla", "Claudia", "Angi", "Débora", "Diane", "Betina", "Cardoso", "Patricia", "Cris"];
 
 /**
  * - Está na lista INACTIVE_PROFESSIONALS

@@ -40,7 +40,10 @@ export function useProfessionalDetails() {
         
         // Filter data by date range and correct category
         let filteredData = filterDataByDateRange(servicesData, dateRange);
-        
+
+        // Save all date-filtered services (before category filter) for unique client counting
+        const allProfessionalServices = [...filteredData];
+
         if (category) {
           if (category === "Serviços de estética facial.") {
             // For estética category, include facial, corporal, depilation and eyebrow services
@@ -62,26 +65,27 @@ export function useProfessionalDetails() {
         let rawServices: any[] = [];
         
         if (category === "Tratamentos para Cabelo") {
-          // Process hair data with new scoring rules (same pattern as manicure)
+          // Process hair data: treatments from filteredData, clients from ALL services
           const professionalData = {
             clientDays: new Set(),
             services: []
           };
 
+          // Treatment entries from category-filtered data
           filteredData.forEach(service => {
-            const serviceName = service.service_name || '';
-            const serviceDate = service.service_date;
-            const clientName = service.client_name;
-
-            // Rule 1: Each service = 2 points (treatment bonus)
             rawServices.push({
               date: convertDateFormat(service.service_date),
               name: service.service_name || "Unknown Service",
               points: 2,
               type: 'treatment'
             });
+          });
 
-            // Rule 2: Each unique client per day = 1 point
+          // Unique client entries from ALL professional services
+          allProfessionalServices.forEach(service => {
+            const clientName = service.client_name;
+            const serviceDate = service.service_date;
+
             if (clientName && clientName.trim()) {
               const clientDayKey = `${clientName.trim()}-${serviceDate}`;
 
@@ -191,19 +195,17 @@ export function useProfessionalDetails() {
         let totalPoints = 0;
         
         if (category === "Tratamentos para Cabelo") {
-          // Use the same logic as useHairTreatmentData for consistency
+          // Treatment points from category-filtered data, unique clients from ALL services
           const professionalData = {
             clientDays: new Set(),
             treatmentServices: 0,
             points: 0
           };
 
+          // Step 1: Treatment services from category-filtered data
           filteredData.forEach(service => {
             const serviceName = service.service_name || "Unknown Service";
-            const serviceDate = service.service_date;
-            const clientName = service.client_name;
 
-            // Rule 1: Each service = 2 points (treatment bonus)
             if (!serviceSummary[serviceName]) {
               serviceSummary[serviceName] = {
                 name: serviceName,
@@ -216,8 +218,13 @@ export function useProfessionalDetails() {
             serviceSummary[serviceName].points += 2;
             professionalData.points += 2;
             professionalData.treatmentServices++;
+          });
 
-            // Rule 2: Each unique client per day = 1 point
+          // Step 2: Unique clients from ALL professional services
+          allProfessionalServices.forEach(service => {
+            const clientName = service.client_name;
+            const serviceDate = service.service_date;
+
             if (clientName && clientName.trim()) {
               const clientDayKey = `${clientName.trim()}-${serviceDate}`;
 
