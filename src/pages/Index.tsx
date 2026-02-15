@@ -4,6 +4,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DataRankings from "@/components/dashboard/DataRankings";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import PremiacaoPanel from "@/components/PremiacaoPanel";
+import RegrasDoDesafio from "@/components/RegrasDoDesafio";
 import DateFilter from "@/components/DateFilter";
 import MonthProgress from "@/components/dashboard/MonthProgress";
 import { EdgeFunctionProcessor } from "@/components/dashboard/EdgeFunctionProcessor";
@@ -111,8 +112,12 @@ function DashboardContent() {
             />
           </div>
 
+          <div className="animate-fade-slide-up stagger-5">
+            <RegrasDoDesafio />
+          </div>
+
           <div className="grid grid-cols-1 gap-5">
-            <div className="animate-fade-slide-up stagger-5">
+            <div className="animate-fade-slide-up stagger-6">
               <DataRankings
                 hairData={hairData}
                 manicureData={manicureData}
