@@ -93,7 +93,7 @@ export default function ProfessionalRanking({
               `}
               onClick={() => onSelectProfessional(item.professional)}
             >
-              <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <div className="flex items-start sm:items-center gap-1.5 sm:gap-2 min-w-0">
                 {/* Position badge */}
                 <div className={`
                   flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full font-mono-num text-xs sm:text-sm font-bold shadow-sm shrink-0
@@ -105,55 +105,56 @@ export default function ProfessionalRanking({
                   {index + 1}º
                 </div>
 
-                {/* Name - grows to fill available space */}
-                <span className={`font-semibold font-body text-xs sm:text-sm truncate min-w-0 flex-1 ${isFirst ? colors.firstNameText : "text-gray-800"}`}>
-                  {item.professional}
-                </span>
+                {/* Content wrapper - two lines on mobile, single line on desktop */}
+                <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1.5">
+                  {/* Name */}
+                  <span className={`font-semibold font-body text-xs sm:text-sm truncate min-w-0 sm:flex-1 ${isFirst ? colors.firstNameText : "text-gray-800"}`}>
+                    {item.professional}
+                  </span>
 
-                {/* Stats with separators */}
-                <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 text-xs sm:text-sm">
-                  {item.starCount > 0 && (
-                    <>
+                  {/* Stats badges - below name on mobile, inline on desktop */}
+                  <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 text-[10px] sm:text-sm">
+                    {item.starCount > 0 && (
                       <span className="inline-flex items-center gap-0.5 font-semibold bg-amber-100 text-amber-800 rounded-full px-1.5 sm:px-2 py-0.5">
                         <Star className="h-3 w-3 sm:h-3.5 sm:w-3.5 fill-amber-500 text-amber-500" />
                         <span className="font-mono-num">{item.starCount}</span>
                       </span>
-                    </>
-                  )}
-                  {categoryKey === PROF_CATEGORIES.CABELO && (
-                    <>
+                    )}
+                    {categoryKey === PROF_CATEGORIES.CABELO && (
+                      <>
+                        <span className="inline-flex items-center bg-slate-100 text-slate-600 rounded-full px-1.5 sm:px-2 py-0.5 font-medium">
+                          <span className="font-mono-num">{item.uniqueClientDays}</span><span className="text-slate-400 ml-0.5">cli</span>
+                        </span>
+                        <span className="inline-flex items-center bg-slate-100 text-slate-600 rounded-full px-1.5 sm:px-2 py-0.5 font-medium">
+                          <span className="font-mono-num">{item.treatmentServices}</span><span className="text-slate-400 ml-0.5">tratam</span>
+                        </span>
+                      </>
+                    )}
+                    {categoryKey === PROF_CATEGORIES.UNHAS && (
+                      <>
+                        <span className="inline-flex items-center bg-slate-100 text-slate-600 rounded-full px-1.5 sm:px-2 py-0.5 font-medium">
+                          <span className="font-mono-num">{item.uniqueClientDays}</span><span className="text-slate-400 ml-0.5">cli</span>
+                        </span>
+                        <span className="inline-flex items-center bg-slate-100 text-slate-600 rounded-full px-1.5 sm:px-2 py-0.5 font-medium">
+                          <span className="font-mono-num">{item.spaServices}</span><span className="text-slate-400 ml-0.5">SPA</span>
+                        </span>
+                      </>
+                    )}
+                    {categoryKey === PROF_CATEGORIES.MAQUIAGEM && (
                       <span className="inline-flex items-center bg-slate-100 text-slate-600 rounded-full px-1.5 sm:px-2 py-0.5 font-medium">
-                        <span className="font-mono-num">{item.uniqueClientDays}</span><span className="text-slate-400 ml-0.5">cli</span>
+                        <span className="font-mono-num">{item.totalServices}</span><span className="text-slate-400 ml-0.5">serv</span>
                       </span>
+                    )}
+                    {categoryKey === PROF_CATEGORIES.ESTETICA && (
                       <span className="inline-flex items-center bg-slate-100 text-slate-600 rounded-full px-1.5 sm:px-2 py-0.5 font-medium">
-                        <span className="font-mono-num">{item.treatmentServices}</span><span className="text-slate-400 ml-0.5">tratam</span>
+                        <span className="font-mono-num">{item.serviceCount}</span><span className="text-slate-400 ml-0.5">serv</span>
                       </span>
-                    </>
-                  )}
-                  {categoryKey === PROF_CATEGORIES.UNHAS && (
-                    <>
-                      <span className="inline-flex items-center bg-slate-100 text-slate-600 rounded-full px-1.5 sm:px-2 py-0.5 font-medium">
-                        <span className="font-mono-num">{item.uniqueClientDays}</span><span className="text-slate-400 ml-0.5">cli</span>
-                      </span>
-                      <span className="inline-flex items-center bg-slate-100 text-slate-600 rounded-full px-1.5 sm:px-2 py-0.5 font-medium">
-                        <span className="font-mono-num">{item.spaServices}</span><span className="text-slate-400 ml-0.5">SPA</span>
-                      </span>
-                    </>
-                  )}
-                  {categoryKey === PROF_CATEGORIES.MAQUIAGEM && (
-                    <span className="inline-flex items-center bg-slate-100 text-slate-600 rounded-full px-1.5 sm:px-2 py-0.5 font-medium">
-                      <span className="font-mono-num">{item.totalServices}</span><span className="text-slate-400 ml-0.5">serv</span>
-                    </span>
-                  )}
-                  {categoryKey === PROF_CATEGORIES.ESTETICA && (
-                    <span className="inline-flex items-center bg-slate-100 text-slate-600 rounded-full px-1.5 sm:px-2 py-0.5 font-medium">
-                      <span className="font-mono-num">{item.serviceCount}</span><span className="text-slate-400 ml-0.5">serv</span>
-                    </span>
-                  )}
+                    )}
+                  </div>
                 </div>
 
                 {/* Score - right-aligned */}
-                <span className={`font-mono-num text-sm sm:text-lg font-bold shrink-0 ml-auto ${isFirst ? colors.firstScoreText : "text-gray-700"}`}>
+                <span className={`font-mono-num text-sm sm:text-lg font-bold shrink-0 ${isFirst ? colors.firstScoreText : "text-gray-700"}`}>
                   {score}
                 </span>
               </div>
