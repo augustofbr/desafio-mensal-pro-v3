@@ -128,6 +128,20 @@ export default function PremiacaoPanel({ hairData, manicureData, esteticaData, m
   ) => {
     const progress = getProgressPercent(winner, config);
 
+    const getStatusLabel = () => {
+      if (!winner) return 'Em andamento';
+      if (winner.type === 'revenue') {
+        const faltam = Math.ceil(100 - winner.revenuePercentage);
+        return `Faltam ${faltam}% para meta mínima`;
+      }
+      if (winner.type === 'services') {
+        const faltam = config.minimo - winner.totalServices;
+        return `Faltam ${faltam} serviços para o mínimo`;
+      }
+      const faltam = config.minimo - winner.uniqueClients;
+      return `Faltam ${faltam} clientes para o mínimo`;
+    };
+
     const getMinimumLabel = () => {
       if (config.type === 'revenue') return `Meta de faturamento`;
       if (config.type === 'services') return `Min. ${config.minimo} serviços`;
@@ -173,7 +187,7 @@ export default function PremiacaoPanel({ hairData, manicureData, esteticaData, m
             ) : (
               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-100 text-amber-700 text-[11px] font-semibold">
                 <AlertCircle className="h-3 w-3" />
-                Em andamento
+                {getStatusLabel()}
               </span>
             )
           )}
