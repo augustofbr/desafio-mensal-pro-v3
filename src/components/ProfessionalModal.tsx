@@ -65,16 +65,16 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
     } else if (category === "Unhas") {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="border-purple-200">
+          <Card className="border-red-200">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Sparkles className="h-5 w-5 text-purple-600" />
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <Sparkles className="h-5 w-5 text-red-600" />
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-sm text-gray-700">SPA dos Pés</h4>
                   <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-2xl font-bold text-purple-600">{summary.spaCount}</span>
+                    <span className="text-2xl font-bold text-red-600">{summary.spaCount}</span>
                     <span className="text-sm text-gray-500">SPA dos Pés</span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">{summary.spaPoints} pontos total</p>
@@ -83,16 +83,16 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
             </CardContent>
           </Card>
 
-          <Card className="border-pink-200">
+          <Card className="border-red-200">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-pink-100 rounded-lg">
-                  <Heart className="h-5 w-5 text-pink-600" />
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <Heart className="h-5 w-5 text-red-600" />
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-sm text-gray-700">Clientes Únicas</h4>
                   <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-2xl font-bold text-pink-600">{summary.manicureUniqueClients}</span>
+                    <span className="text-2xl font-bold text-red-600">{summary.manicureUniqueClients}</span>
                     <span className="text-sm text-gray-500">clientes</span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">{summary.manicureClientPoints} pontos total</p>
@@ -105,16 +105,16 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
     } else if (category === "Estetica") {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="border-orange-200">
+          <Card className="border-violet-200">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <Sparkles className="h-5 w-5 text-orange-600" />
+                <div className="p-2 bg-violet-100 rounded-lg">
+                  <Sparkles className="h-5 w-5 text-violet-600" />
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-sm text-gray-700">Serviços Realizados</h4>
                   <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-2xl font-bold text-orange-600">{summary.esteticaServiceCount}</span>
+                    <span className="text-2xl font-bold text-violet-600">{summary.esteticaServiceCount}</span>
                     <span className="text-sm text-gray-500">serviços</span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">Total no período</p>
@@ -123,16 +123,16 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
             </CardContent>
           </Card>
 
-          <Card className="border-teal-200">
+          <Card className="border-violet-200">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-teal-100 rounded-lg">
-                  <Heart className="h-5 w-5 text-teal-600" />
+                <div className="p-2 bg-violet-100 rounded-lg">
+                  <Heart className="h-5 w-5 text-violet-600" />
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-sm text-gray-700">Percentual da Meta</h4>
                   <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-2xl font-bold text-teal-600">{summary.esteticaRevenuePercentage}%</span>
+                    <span className="text-2xl font-bold text-violet-600">{summary.esteticaRevenuePercentage}%</span>
                     <span className="text-sm text-gray-500">da meta</span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">Meta de faturamento</p>
@@ -145,16 +145,16 @@ export default function ProfessionalModal({ isOpen, onClose, details, category }
     } else if (category === "Maquiagem") {
       return (
         <div className="grid grid-cols-1 gap-4">
-          <Card className="border-rose-200">
+          <Card className="border-yellow-200">
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-rose-100 rounded-lg">
-                  <Sparkles className="h-5 w-5 text-rose-600" />
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <Sparkles className="h-5 w-5 text-yellow-600" />
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-sm text-gray-700">Serviços Realizados</h4>
                   <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-2xl font-bold text-rose-600">{summary.maquiagemTotalServices}</span>
+                    <span className="text-2xl font-bold text-yellow-600">{summary.maquiagemTotalServices}</span>
                     <span className="text-sm text-gray-500">serviços</span>
                   </div>
                   <p className="text-xs text-gray-600 mt-1">{summary.maquiagemTotalPoints} pontos total</p>

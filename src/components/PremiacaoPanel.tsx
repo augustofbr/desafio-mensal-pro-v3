@@ -1,5 +1,5 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, Award, CheckCircle, AlertCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Trophy, Award, CheckCircle, AlertCircle, Star } from "lucide-react";
 import { getCurrentMonthName } from "@/lib/utils";
 
 interface PremiacaoPanelProps {
@@ -47,6 +47,9 @@ export default function PremiacaoPanel({ hairData, manicureData, esteticaData, m
 
     const leader = data[0];
 
+    const starCount = leader.starCount || 0;
+    const starPoints = leader.starPoints || 0;
+
     if (config.type === 'revenue') {
       const totalRevenue = leader.totalRevenue || 0;
       const revenuePercentage = leader.revenuePercentage || 0;
@@ -58,6 +61,8 @@ export default function PremiacaoPanel({ hairData, manicureData, esteticaData, m
         totalRevenue,
         revenuePercentage,
         qualified,
+        starCount,
+        starPoints,
         type: 'revenue' as const,
       };
     } else if (config.type === 'services') {
@@ -69,6 +74,8 @@ export default function PremiacaoPanel({ hairData, manicureData, esteticaData, m
         points: leader.points,
         totalServices,
         qualified,
+        starCount,
+        starPoints,
         type: 'services' as const,
       };
     } else {
@@ -80,6 +87,8 @@ export default function PremiacaoPanel({ hairData, manicureData, esteticaData, m
         points: leader.points,
         uniqueClients,
         qualified,
+        starCount,
+        starPoints,
         type: 'clients' as const,
       };
     }
@@ -94,176 +103,185 @@ export default function PremiacaoPanel({ hairData, manicureData, esteticaData, m
     return (
       <Card className="mb-6">
         <CardContent className="p-6">
-          <div className="flex justify-center items-center h-32">
-            <p className="text-gray-500 text-lg">Carregando dados...</p>
+          <div className="space-y-3">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="h-20 rounded-xl animate-shimmer" />
+            ))}
           </div>
         </CardContent>
       </Card>
     );
   }
 
+  const getProgressPercent = (winner: ReturnType<typeof getCategoryWinner>, config: CategoryConfig): number => {
+    if (!winner) return 0;
+    if (winner.type === 'revenue') return Math.min(winner.revenuePercentage, 100);
+    if (winner.type === 'services') return Math.min((winner.totalServices / config.minimo) * 100, 100);
+    return Math.min((winner.uniqueClients / config.minimo) * 100, 100);
+  };
+
   const renderCategoryAward = (
     config: CategoryConfig,
     winner: ReturnType<typeof getCategoryWinner>,
-    colorScheme: { bg: string; border: string; text: string; badge: string; icon: string }
+    colorScheme: { gradient: string; bgLight: string; text: string; progressBg: string; progressFill: string; iconBg: string },
+    index: number
   ) => {
+    const progress = getProgressPercent(winner, config);
+
     const getMinimumLabel = () => {
-      if (config.type === 'revenue') {
-        return `Meta de faturamento`;
-      } else if (config.type === 'services') {
-        return `Mín. ${config.minimo} serviços`;
-      } else {
-        return `Mín. ${config.minimo} clientes`;
-      }
+      if (config.type === 'revenue') return `Meta de faturamento`;
+      if (config.type === 'services') return `Min. ${config.minimo} serviços`;
+      return `Min. ${config.minimo} clientes`;
     };
 
     const getPointsDisplay = () => {
       if (!winner) return '';
-      if (winner.type === 'revenue') {
-        return `${winner.revenuePercentage}% da meta`;
-      }
+      if (winner.type === 'revenue') return `${winner.revenuePercentage}% da meta`;
       return `${winner.points} pontos`;
     };
 
-    const getQualificationStatus = () => {
-      if (!winner) return null;
-
-      if (winner.qualified) {
-        return (
-          <div className="flex items-center gap-1 text-green-600">
-            <CheckCircle className="h-5 w-5" />
-            <span className="text-sm font-medium">Qualificado</span>
-          </div>
-        );
-      }
-
-      if (winner.type === 'revenue') {
-        const percentAchieved = winner.revenuePercentage;
-        const percentRemaining = Math.round((100 - percentAchieved) * 10) / 10;
-        return (
-          <div className="flex items-center gap-1 text-amber-600">
-            <AlertCircle className="h-5 w-5" />
-            <span className="text-sm font-medium">
-              {percentAchieved}% alcançado | Faltam {percentRemaining}%
-            </span>
-          </div>
-        );
-      } else if (winner.type === 'services') {
-        return (
-          <div className="flex items-center gap-1 text-amber-600">
-            <AlertCircle className="h-5 w-5" />
-            <span className="text-sm font-medium">Faltam {config.minimo - winner.totalServices} serviços</span>
-          </div>
-        );
-      } else {
-        return (
-          <div className="flex items-center gap-1 text-amber-600">
-            <AlertCircle className="h-5 w-5" />
-            <span className="text-sm font-medium">Faltam {config.minimo - winner.uniqueClients} atendimentos</span>
-          </div>
-        );
-      }
-    };
-
-    const getProgressDetails = () => {
+    const getProgressLabel = () => {
       if (!winner) return '';
       if (winner.type === 'revenue') {
-        return `${winner.revenuePercentage}% da meta de faturamento mínimo`;
+        return `${winner.revenuePercentage}% da meta de faturamento`;
       } else if (winner.type === 'services') {
-        return `Serviços realizados: ${winner.totalServices} / ${config.minimo} (min.)`;
-      } else {
-        return `Clientes únicas: ${winner.uniqueClients} / ${config.minimo} (min.)`;
+        return `${winner.totalServices} / ${config.minimo} serviços`;
       }
+      return `${winner.uniqueClients} / ${config.minimo} clientes`;
     };
 
     return (
-      <div className={`rounded-lg border-2 ${colorScheme.border} ${colorScheme.bg} p-4`}>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Award className={`h-5 w-5 ${colorScheme.icon}`} />
-            <h4 className="font-semibold text-gray-800">{config.label}</h4>
+      <div
+        className={`animate-fade-slide-up stagger-${index + 1} rounded-2xl ${colorScheme.bgLight} p-4 relative overflow-hidden`}
+      >
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center gap-2.5">
+            <div className={`w-9 h-9 rounded-xl ${colorScheme.gradient} flex items-center justify-center shadow-sm`}>
+              <Award className="h-4.5 w-4.5 text-white" />
+            </div>
+            <div>
+              <h4 className="font-display font-semibold text-base text-gray-800">{config.label}</h4>
+              <p className="text-[11px] text-gray-500 font-body">{getMinimumLabel()}</p>
+            </div>
           </div>
-          <span className={`text-sm font-bold px-3 py-1 rounded-full ${colorScheme.badge}`}>
-            {getMinimumLabel()}
-          </span>
+          {winner && (
+            winner.qualified ? (
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-semibold">
+                <CheckCircle className="h-3 w-3" />
+                Qualificado
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-100 text-amber-700 text-[11px] font-semibold">
+                <AlertCircle className="h-3 w-3" />
+                Em andamento
+              </span>
+            )
+          )}
         </div>
 
         {winner ? (
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-lg font-bold text-gray-900">{winner.professional}</p>
-                <p className="text-sm text-gray-600">{getPointsDisplay()}</p>
+              <div className="flex items-center gap-2">
+                <p className="font-body font-bold text-gray-900 text-sm">{winner.professional}</p>
+                {winner.starCount > 0 && (
+                  <span className="inline-flex items-center gap-0.5 text-yellow-600 text-[11px] font-medium">
+                    <Star className="h-2.5 w-2.5 fill-yellow-400 text-yellow-500" />
+                    {winner.starCount}
+                    {winner.starPoints > 0 && <span className="text-gray-500">(+{winner.starPoints}pts)</span>}
+                  </span>
+                )}
               </div>
-              {getQualificationStatus()}
+              <span className={`font-mono-num font-bold text-sm ${colorScheme.text}`}>
+                {getPointsDisplay()}
+              </span>
             </div>
-            <div className="text-xs text-gray-500">
-              {getProgressDetails()}
+
+            <div className="space-y-1">
+              <div className={`w-full h-2 rounded-full ${colorScheme.progressBg} overflow-hidden`}>
+                <div
+                  className={`h-full rounded-full ${colorScheme.progressFill} animate-progress-fill`}
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="text-[11px] text-gray-500 font-body">{getProgressLabel()}</p>
             </div>
           </div>
         ) : (
-          <p className="text-sm text-gray-500">Nenhum profissional com pontuação nesta categoria no mês de {currentMonth}.</p>
+          <p className="text-xs text-gray-500 font-body py-2">
+            Nenhum profissional com pontuação em {currentMonth}.
+          </p>
         )}
       </div>
     );
   };
 
   return (
-    <Card className="mb-6 border-2 border-yellow-300 bg-gradient-to-r from-yellow-50 to-amber-50">
-      <CardHeader className="pb-3">
-        <div className="flex items-center gap-2">
-          <Trophy className="h-6 w-6 text-yellow-600" />
-          <CardTitle className="text-xl">Painel de Premiação</CardTitle>
+    <Card className="mb-6 border-0 shadow-md bg-gradient-to-br from-amber-50/80 via-white to-orange-50/50">
+      <CardHeader className="pb-3 px-4">
+        <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center shadow-sm">
+            <Trophy className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <CardTitle className="font-display text-lg">Painel de Premiação</CardTitle>
+            <p className="text-xs text-gray-500 font-body">Ganhadores atuais de {currentMonth}</p>
+          </div>
         </div>
-        <CardDescription>
-          Premiação mensal para os profissionais destaque de {currentMonth}
-        </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <CardContent className="px-4 pb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {renderCategoryAward(
             PREMIACAO_CONFIG.cabelo,
             hairWinner,
             {
-              bg: "bg-blue-50",
-              border: "border-blue-200",
-              text: "text-blue-700",
-              badge: "bg-blue-100 text-blue-700",
-              icon: "text-blue-600",
-            }
+              gradient: "gradient-cabelo",
+              bgLight: "bg-blue-50/80",
+              text: "text-blue-600",
+              progressBg: "bg-blue-100",
+              progressFill: "bg-gradient-to-r from-blue-400 to-blue-500",
+              iconBg: "bg-blue-500",
+            },
+            0
           )}
           {renderCategoryAward(
             PREMIACAO_CONFIG.unhas,
             manicureWinner,
             {
-              bg: "bg-pink-50",
-              border: "border-pink-200",
-              text: "text-pink-700",
-              badge: "bg-pink-100 text-pink-700",
-              icon: "text-pink-600",
-            }
-          )}
-          {renderCategoryAward(
-            PREMIACAO_CONFIG.estetica,
-            esteticaWinner,
-            {
-              bg: "bg-orange-50",
-              border: "border-orange-200",
-              text: "text-orange-700",
-              badge: "bg-orange-100 text-orange-700",
-              icon: "text-orange-600",
-            }
+              gradient: "gradient-unhas",
+              bgLight: "bg-red-50/80",
+              text: "text-red-600",
+              progressBg: "bg-red-100",
+              progressFill: "bg-gradient-to-r from-red-400 to-red-500",
+              iconBg: "bg-red-500",
+            },
+            1
           )}
           {renderCategoryAward(
             PREMIACAO_CONFIG.maquiagem,
             maquiagemWinner,
             {
-              bg: "bg-rose-50",
-              border: "border-rose-200",
-              text: "text-rose-700",
-              badge: "bg-rose-100 text-rose-700",
-              icon: "text-rose-600",
-            }
+              gradient: "gradient-make",
+              bgLight: "bg-yellow-50/80",
+              text: "text-yellow-600",
+              progressBg: "bg-yellow-100",
+              progressFill: "bg-gradient-to-r from-yellow-400 to-yellow-500",
+              iconBg: "bg-yellow-500",
+            },
+            2
+          )}
+          {renderCategoryAward(
+            PREMIACAO_CONFIG.estetica,
+            esteticaWinner,
+            {
+              gradient: "gradient-estetica",
+              bgLight: "bg-violet-50/80",
+              text: "text-violet-600",
+              progressBg: "bg-violet-100",
+              progressFill: "bg-gradient-to-r from-violet-400 to-violet-500",
+              iconBg: "bg-violet-500",
+            },
+            3
           )}
         </div>
       </CardContent>

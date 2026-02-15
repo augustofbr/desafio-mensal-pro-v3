@@ -61,49 +61,58 @@ function DashboardContent() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 bg-gray-50">
+    <div className="min-h-screen bg-gradient-warm">
       <EdgeFunctionProcessor
         refreshData={refreshData}
       />
 
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col items-center mb-6">
-          <img
-            src="/lovable-uploads/0cb6b226-2d51-4078-9b78-b6565c728721.png"
-            alt="Studio X - Salão de Beleza & Estética"
-            className="h-24 md:h-28 mb-2"
+      {/* Header */}
+      <div className="px-4 pt-6 pb-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col items-center mb-5 animate-fade-slide-up">
+            <img
+              src="/lovable-uploads/0cb6b226-2d51-4078-9b78-b6565c728721.png"
+              alt="Studio X - Salão de Beleza & Estética"
+              className="h-20 md:h-28 mb-3"
+            />
+            <h1 className="text-2xl md:text-4xl font-display font-bold text-gray-800 text-center leading-tight">
+              Desafio do Profissional Parceiro
+            </h1>
+            <p className="text-sm text-gray-500 font-body text-center mt-1.5 font-medium">
+              {getDataPeriodFromFilter()}
+            </p>
+          </div>
+
+          <div className="animate-fade-slide-up stagger-2">
+            <DateFilter />
+          </div>
+
+          <div className="animate-fade-slide-up stagger-3">
+            <MonthProgress
+              workedDays={workedDays}
+              remainingDays={remainingDays}
+              totalDays={totalDays}
+              className="mb-5"
+            />
+          </div>
+
+          <DashboardHeader
+            lastUpdate={lastUpdate}
+            loading={loading}
           />
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 text-center">Desafio do Profissional Parceiro - V3</h1>
-          <p className="text-lg md:text-xl text-gray-600 text-center mt-2">
-            {getDataPeriodFromFilter()}
-          </p>
-        </div>
 
-        <DateFilter />
+          <div className="animate-fade-slide-up stagger-4">
+            <PremiacaoPanel
+              hairData={hairData}
+              manicureData={manicureData}
+              esteticaData={esteticaData}
+              maquiagemData={maquiagemData}
+              loading={loading}
+            />
+          </div>
 
-        <MonthProgress
-          workedDays={workedDays}
-          remainingDays={remainingDays}
-          totalDays={totalDays}
-          className="mb-6"
-        />
-
-        <DashboardHeader
-          lastUpdate={lastUpdate}
-          loading={loading}
-        />
-
-        <PremiacaoPanel
-          hairData={hairData}
-          manicureData={manicureData}
-          esteticaData={esteticaData}
-          maquiagemData={maquiagemData}
-          loading={loading}
-        />
-
-        <div className="grid grid-cols-1 gap-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-5">
+            <div className="animate-fade-slide-up stagger-5">
               <DataRankings
                 hairData={hairData}
                 manicureData={manicureData}
@@ -118,21 +127,26 @@ function DashboardContent() {
               />
             </div>
 
-            <div className="lg:col-span-2">
-              {loading ? (
-                <Card className="p-6">
-                  <div className="flex justify-center items-center h-64">
-                    <p className="text-gray-500 text-lg">Carregando dados...</p>
-                  </div>
-                </Card>
-              ) : (
-                <DashboardCharts
-                  hairData={hairData}
-                  manicureData={manicureData}
-                  esteticaData={esteticaData}
-                  maquiagemData={maquiagemData}
-                />
-              )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+              <div className="lg:col-span-3">
+                {loading ? (
+                  <Card className="p-6 border-0 shadow-sm">
+                    <div className="flex justify-center items-center h-64">
+                      <div className="text-center">
+                        <div className="w-12 h-12 mx-auto mb-3 rounded-full animate-shimmer" />
+                        <p className="text-gray-500 text-sm font-body">Carregando dados...</p>
+                      </div>
+                    </div>
+                  </Card>
+                ) : (
+                  <DashboardCharts
+                    hairData={hairData}
+                    manicureData={manicureData}
+                    esteticaData={esteticaData}
+                    maquiagemData={maquiagemData}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>

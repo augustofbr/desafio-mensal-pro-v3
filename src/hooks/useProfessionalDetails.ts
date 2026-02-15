@@ -97,8 +97,6 @@ export function useProfessionalDetails() {
 
           filteredData.forEach(service => {
             const serviceName = service.service_name || '';
-            const serviceDate = service.service_date;
-            const clientName = service.client_name;
 
             if (serviceName === "SPA dos Pés") {
               rawServices.push({
@@ -108,6 +106,11 @@ export function useProfessionalDetails() {
                 type: 'spa'
               });
             }
+          });
+
+          allProfessionalServices.forEach(service => {
+            const clientName = service.client_name;
+            const serviceDate = service.service_date;
 
             if (clientName && clientName.trim()) {
               const clientDayKey = `${clientName.trim()}-${serviceDate}`;
@@ -215,8 +218,6 @@ export function useProfessionalDetails() {
 
           filteredData.forEach(service => {
             const serviceName = service.service_name || '';
-            const serviceDate = service.service_date;
-            const clientName = service.client_name;
 
             if (serviceName === "SPA dos Pés") {
               if (!serviceSummary[serviceName]) {
@@ -232,6 +233,11 @@ export function useProfessionalDetails() {
               professionalData.points += 2;
               professionalData.spaServices++;
             }
+          });
+
+          allProfessionalServices.forEach(service => {
+            const clientName = service.client_name;
+            const serviceDate = service.service_date;
 
             if (clientName && clientName.trim()) {
               const clientDayKey = `${clientName.trim()}-${serviceDate}`;

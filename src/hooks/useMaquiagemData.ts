@@ -3,7 +3,7 @@ import { convertDateFormat } from "@/lib/utils";
 import { useDateFilter } from "@/contexts/DateFilterContext";
 import { filterDataByDateRange } from "@/lib/dateUtils";
 
-export function useMaquiagemData(allServicesData: any[], categoryProfessionals: string[]) {
+export function useMaquiagemData(allServicesData: any[], categoryProfessionals: string[], starsByProfessional: Map<string, number> = new Map()) {
   const [maquiagemData, setMaquiagemData] = useState<any[]>([]);
   const { getFilteredDateRange } = useDateFilter();
 
@@ -45,12 +45,28 @@ export function useMaquiagemData(allServicesData: any[], categoryProfessionals: 
       return acc;
     }, {});
 
-    const cleanedData = Object.values(professionalPoints).map((prof: any) => ({
-      professional: prof.professional,
-      points: prof.points,
-      services: prof.services,
-      totalServices: prof.totalServices
-    }));
+    // Add professionals who only have stars (with 0 points)
+    starsByProfessional.forEach((starCount, professional) => {
+      if (!professionalPoints[professional]) {
+        professionalPoints[professional] = {
+          professional,
+          points: 0,
+          services: [],
+          totalServices: 0
+        };
+      }
+    });
+
+    const cleanedData = Object.values(professionalPoints).map((prof: any) => {
+      const starCount = starsByProfessional.get(prof.professional) || 0;
+      return {
+        professional: prof.professional,
+        points: prof.points,
+        services: prof.services,
+        totalServices: prof.totalServices,
+        starCount
+      };
+    });
 
     const sortedData = cleanedData.sort(
       (a: any, b: any) => b.points - a.points
@@ -73,10 +89,12 @@ export function useMaquiagemData(allServicesData: any[], categoryProfessionals: 
       console.log("Maquiagem services found:", categoryServices.length, "from", categoryProfessionals.length, "professionals");
 
       processMaquiagemData(categoryServices);
+    } else if (starsByProfessional.size > 0) {
+      processMaquiagemData([]);
     } else {
       setMaquiagemData([]);
     }
-  }, [allServicesData, getFilteredDateRange, categoryProfessionals]);
+  }, [allServicesData, getFilteredDateRange, categoryProfessionals, starsByProfessional]);
 
   return maquiagemData;
 }

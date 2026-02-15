@@ -10,11 +10,18 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
 const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// CORS headers for browser requests
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// CORS: restrict to allowed origins (comma-separated in env var, or fallback to Supabase URL)
+const allowedOrigins = (Deno.env.get("ALLOWED_ORIGINS") || supabaseUrl).split(",").map(o => o.trim());
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("origin") || "";
+  const isAllowed = allowedOrigins.some(allowed => origin === allowed || allowed === "*");
+  return {
+    "Access-Control-Allow-Origin": isAllowed ? origin : allowedOrigins[0],
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Vary": "Origin",
+  };
+}
 
 // Process existing data in the database and ensure dates are in correct format
 async function processExistingData() {
@@ -127,21 +134,23 @@ async function enableRealtime() {
 }
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
-  
+
   try {
     console.log("Starting data processing...");
-    
+
     // Process existing data and ensure realtime is enabled
     const result = await processExistingData();
-    
+
     // Return the result
     return new Response(
       JSON.stringify(result),
-      { 
+      {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: result.success ? 200 : 500
       }
@@ -149,10 +158,10 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = `Data processing error: ${error.message}`;
     console.error(errorMessage);
-    
+
     return new Response(
       JSON.stringify({ success: false, message: errorMessage }),
-      { 
+      {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500
       }

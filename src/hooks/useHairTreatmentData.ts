@@ -3,8 +3,9 @@ import { useState, useEffect } from "react";
 import { convertDateFormat } from "@/lib/utils";
 import { useDateFilter } from "@/contexts/DateFilterContext";
 import { filterDataByDateRange } from "@/lib/dateUtils";
+import { STAR_POINTS_VALUE } from "./useStarsData";
 
-export function useHairTreatmentData(allServicesData: any[], categoryProfessionals: string[]) {
+export function useHairTreatmentData(allServicesData: any[], categoryProfessionals: string[], starsByProfessional: Map<string, number> = new Map()) {
   const [hairData, setHairData] = useState<any[]>([]);
   const { getFilteredDateRange } = useDateFilter();
 
@@ -76,14 +77,43 @@ export function useHairTreatmentData(allServicesData: any[], categoryProfessiona
       });
     });
 
+    // Step 3: Add star points for each professional
+    starsByProfessional.forEach((starCount, professional) => {
+      if (!professionalPoints[professional]) {
+        // Professional has stars but no services - add them to the ranking
+        professionalPoints[professional] = {
+          professional,
+          points: 0,
+          services: [],
+          clientDays: new Set(),
+          treatmentServices: 0
+        };
+      }
+
+      const starPoints = starCount * STAR_POINTS_VALUE;
+      professionalPoints[professional].points += starPoints;
+
+      professionalPoints[professional].services.push({
+        date: '',
+        name: `Estrelas Google: ${starCount} estrela${starCount > 1 ? 's' : ''} aprovada${starCount > 1 ? 's' : ''}`,
+        points: starPoints,
+        type: 'star'
+      });
+    });
+
     // Clean up the data structure for final output (remove Set objects)
-    const cleanedData = Object.values(professionalPoints).map((prof: any) => ({
-      professional: prof.professional,
-      points: prof.points,
-      services: prof.services,
-      treatmentServices: prof.treatmentServices,
-      uniqueClientDays: prof.clientDays.size
-    }));
+    const cleanedData = Object.values(professionalPoints).map((prof: any) => {
+      const starCount = starsByProfessional.get(prof.professional) || 0;
+      return {
+        professional: prof.professional,
+        points: prof.points,
+        services: prof.services,
+        treatmentServices: prof.treatmentServices,
+        uniqueClientDays: prof.clientDays.size,
+        starCount,
+        starPoints: starCount * STAR_POINTS_VALUE
+      };
+    });
 
     // Sort by points (descending)
     const sortedData = cleanedData.sort(
@@ -111,10 +141,13 @@ export function useHairTreatmentData(allServicesData: any[], categoryProfessiona
 
       console.log("Hair treatments found:", hairTreatments.length, "from", categoryProfessionals.length, "professionals");
       processHairTreatmentData(hairTreatments, categoryServices);
+    } else if (starsByProfessional.size > 0) {
+      // No services but stars exist - process stars only
+      processHairTreatmentData([], []);
     } else {
       setHairData([]);
     }
-  }, [allServicesData, getFilteredDateRange, categoryProfessionals]);
+  }, [allServicesData, getFilteredDateRange, categoryProfessionals, starsByProfessional]);
 
   return hairData;
 }

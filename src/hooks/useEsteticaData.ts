@@ -5,7 +5,7 @@ import { filterDataByDateRange } from "@/lib/dateUtils";
 
 export const ESTETICA_REVENUE_MINIMUM = 5000;
 
-export function useEsteticaData(allServicesData: any[], categoryProfessionals: string[]) {
+export function useEsteticaData(allServicesData: any[], categoryProfessionals: string[], starsByProfessional: Map<string, number> = new Map()) {
   const [esteticaData, setEsteticaData] = useState<any[]>([]);
   const { getFilteredDateRange } = useDateFilter();
 
@@ -46,8 +46,21 @@ export function useEsteticaData(allServicesData: any[], categoryProfessionals: s
       return acc;
     }, {});
 
+    // Add professionals who only have stars (with 0 revenue)
+    starsByProfessional.forEach((starCount, professional) => {
+      if (!professionalRevenue[professional]) {
+        professionalRevenue[professional] = {
+          professional,
+          totalRevenue: 0,
+          services: [],
+          serviceCount: 0
+        };
+      }
+    });
+
     const cleanedData = Object.values(professionalRevenue).map((prof: any) => {
       const revenuePercentage = Math.round(((prof.totalRevenue / ESTETICA_REVENUE_MINIMUM) * 100) * 10) / 10;
+      const starCount = starsByProfessional.get(prof.professional) || 0;
 
       return {
         professional: prof.professional,
@@ -55,7 +68,8 @@ export function useEsteticaData(allServicesData: any[], categoryProfessionals: s
         revenuePercentage,
         points: revenuePercentage,
         services: prof.services,
-        serviceCount: prof.serviceCount
+        serviceCount: prof.serviceCount,
+        starCount
       };
     });
 
@@ -80,10 +94,12 @@ export function useEsteticaData(allServicesData: any[], categoryProfessionals: s
       console.log("Estética services found:", categoryServices.length, "from", categoryProfessionals.length, "professionals");
 
       processEsteticaData(categoryServices);
+    } else if (starsByProfessional.size > 0) {
+      processEsteticaData([]);
     } else {
       setEsteticaData([]);
     }
-  }, [allServicesData, getFilteredDateRange, categoryProfessionals]);
+  }, [allServicesData, getFilteredDateRange, categoryProfessionals, starsByProfessional]);
 
   return esteticaData;
 }

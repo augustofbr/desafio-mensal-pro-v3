@@ -3,8 +3,9 @@ import { useState, useEffect } from "react";
 import { convertDateFormat } from "@/lib/utils";
 import { useDateFilter } from "@/contexts/DateFilterContext";
 import { filterDataByDateRange } from "@/lib/dateUtils";
+import { STAR_POINTS_VALUE } from "./useStarsData";
 
-export function useManicurePedicureData(allServicesData: any[], categoryProfessionals: string[]) {
+export function useManicurePedicureData(allServicesData: any[], categoryProfessionals: string[], starsByProfessional: Map<string, number> = new Map()) {
   const [manicureData, setManicureData] = useState<any[]>([]);
   const { getFilteredDateRange } = useDateFilter();
 
@@ -71,14 +72,42 @@ export function useManicurePedicureData(allServicesData: any[], categoryProfessi
       return acc;
     }, {});
 
+    // Add star points for each professional
+    starsByProfessional.forEach((starCount, professional) => {
+      if (!professionalPoints[professional]) {
+        professionalPoints[professional] = {
+          professional,
+          points: 0,
+          services: [],
+          clientDays: new Set(),
+          spaServices: 0
+        };
+      }
+
+      const starPoints = starCount * STAR_POINTS_VALUE;
+      professionalPoints[professional].points += starPoints;
+
+      professionalPoints[professional].services.push({
+        date: '',
+        name: `Estrelas Google: ${starCount} estrela${starCount > 1 ? 's' : ''} aprovada${starCount > 1 ? 's' : ''}`,
+        points: starPoints,
+        type: 'star'
+      });
+    });
+
     // Clean up the data structure for final output (remove Set objects)
-    const cleanedData = Object.values(professionalPoints).map((prof: any) => ({
-      professional: prof.professional,
-      points: prof.points,
-      services: prof.services,
-      spaServices: prof.spaServices,
-      uniqueClientDays: prof.clientDays.size
-    }));
+    const cleanedData = Object.values(professionalPoints).map((prof: any) => {
+      const starCount = starsByProfessional.get(prof.professional) || 0;
+      return {
+        professional: prof.professional,
+        points: prof.points,
+        services: prof.services,
+        spaServices: prof.spaServices,
+        uniqueClientDays: prof.clientDays.size,
+        starCount,
+        starPoints: starCount * STAR_POINTS_VALUE
+      };
+    });
 
     // Sort by points (descending)
     const sortedData = cleanedData.sort(
@@ -102,10 +131,12 @@ export function useManicurePedicureData(allServicesData: any[], categoryProfessi
       console.log("Manicure services found:", categoryServices.length, "from", categoryProfessionals.length, "professionals");
 
       processManicurePedicureData(categoryServices);
+    } else if (starsByProfessional.size > 0) {
+      processManicurePedicureData([]);
     } else {
       setManicureData([]);
     }
-  }, [allServicesData, getFilteredDateRange, categoryProfessionals]);
+  }, [allServicesData, getFilteredDateRange, categoryProfessionals, starsByProfessional]);
 
   return manicureData;
 }

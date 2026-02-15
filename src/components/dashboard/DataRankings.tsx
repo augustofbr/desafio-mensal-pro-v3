@@ -1,7 +1,9 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProfessionalRanking from "@/components/ProfessionalRanking";
 import { getCategoryDisplayName, PROF_CATEGORIES, isCategoryEnabled } from "@/lib/categoryDisplayNames";
+import { BarChart3 } from "lucide-react";
+import { getCurrentMonthName } from "@/lib/utils";
 
 interface DataRankingsProps {
   hairData: any[];
@@ -16,6 +18,33 @@ interface DataRankingsProps {
   onCloseDetails: () => void;
 }
 
+const CATEGORY_CONFIG = {
+  [PROF_CATEGORIES.CABELO]: {
+    titleColor: "text-blue-600",
+    borderColor: "border-blue-100",
+    bgLight: "bg-blue-50/40",
+    separatorColor: "bg-gray-200",
+  },
+  [PROF_CATEGORIES.UNHAS]: {
+    titleColor: "text-red-500",
+    borderColor: "border-red-100",
+    bgLight: "bg-red-50/40",
+    separatorColor: "bg-gray-200",
+  },
+  [PROF_CATEGORIES.MAQUIAGEM]: {
+    titleColor: "text-yellow-600",
+    borderColor: "border-yellow-100",
+    bgLight: "bg-yellow-50/40",
+    separatorColor: "bg-gray-200",
+  },
+  [PROF_CATEGORIES.ESTETICA]: {
+    titleColor: "text-violet-600",
+    borderColor: "border-violet-100",
+    bgLight: "bg-violet-50/40",
+    separatorColor: "bg-gray-200",
+  },
+};
+
 export default function DataRankings({
   hairData,
   manicureData,
@@ -28,115 +57,67 @@ export default function DataRankings({
   showDetails,
   onCloseDetails
 }: DataRankingsProps) {
+  const currentMonth = getCurrentMonthName();
+
+  const categories = [
+    { key: PROF_CATEGORIES.CABELO, data: hairData, enabled: isCategoryEnabled(PROF_CATEGORIES.CABELO) },
+    { key: PROF_CATEGORIES.UNHAS, data: manicureData, enabled: isCategoryEnabled(PROF_CATEGORIES.UNHAS) },
+    { key: PROF_CATEGORIES.MAQUIAGEM, data: maquiagemData, enabled: isCategoryEnabled(PROF_CATEGORIES.MAQUIAGEM) },
+    { key: PROF_CATEGORIES.ESTETICA, data: esteticaData, enabled: isCategoryEnabled(PROF_CATEGORIES.ESTETICA) },
+  ];
+
+  const enabledCategories = categories.filter(c => c.enabled);
+
   return (
-    <div className="space-y-6">
-      {isCategoryEnabled(PROF_CATEGORIES.CABELO) && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{getCategoryDisplayName(PROF_CATEGORIES.CABELO)}</CardTitle>
-            <CardDescription>
-              Pontuação: Tratamentos = 2 pontos + 1 ponto por cliente única atendida por dia
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="flex justify-center items-center h-32">
-                <p className="text-gray-500 text-lg">Carregando dados...</p>
-              </div>
-            ) : (
-              <ProfessionalRanking
-                data={hairData}
-                onSelectProfessional={(professional) => onSelectProfessional(professional, PROF_CATEGORIES.CABELO)}
-                professionalDetails={professionalDetails}
-                selectedCategory={selectedCategory}
-                showDetails={showDetails}
-                onCloseDetails={onCloseDetails}
-              />
-            )}
-          </CardContent>
-        </Card>
-      )}
+    <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50/80 via-white to-slate-50/50">
+      <CardHeader className="pb-3 px-4">
+        <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center shadow-sm">
+            <BarChart3 className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <CardTitle className="font-display text-lg">Ranking por Categorias</CardTitle>
+            <p className="text-xs text-gray-500 font-body">Classificação de {currentMonth}</p>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="px-4 pb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {enabledCategories.map((category, index) => {
+            const config = CATEGORY_CONFIG[category.key];
 
-      {isCategoryEnabled(PROF_CATEGORIES.UNHAS) && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{getCategoryDisplayName(PROF_CATEGORIES.UNHAS)}</CardTitle>
-            <CardDescription>
-              Pontuação: SPA dos Pés = 2 pontos + 1 ponto por cliente única atendida por dia
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="flex justify-center items-center h-32">
-                <p className="text-gray-500 text-lg">Carregando dados...</p>
-              </div>
-            ) : (
-              <ProfessionalRanking
-                data={manicureData}
-                onSelectProfessional={(professional) => onSelectProfessional(professional, PROF_CATEGORIES.UNHAS)}
-                professionalDetails={professionalDetails}
-                selectedCategory={selectedCategory}
-                showDetails={showDetails}
-                onCloseDetails={onCloseDetails}
-              />
-            )}
-          </CardContent>
-        </Card>
-      )}
+            return (
+              <div
+                key={category.key}
+                className={`animate-fade-slide-up stagger-${Math.min(index + 1, 8)} rounded-2xl border ${config.borderColor} ${config.bgLight} p-4`}
+              >
+                <h3 className={`text-center font-display text-lg font-bold italic ${config.titleColor}`}>
+                  {getCategoryDisplayName(category.key)}
+                </h3>
+                <div className={`h-px ${config.separatorColor} my-3`} />
 
-      {isCategoryEnabled(PROF_CATEGORIES.MAQUIAGEM) && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{getCategoryDisplayName(PROF_CATEGORIES.MAQUIAGEM)}</CardTitle>
-            <CardDescription>
-              Pontuação: 1 ponto por serviço realizado
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="flex justify-center items-center h-32">
-                <p className="text-gray-500 text-lg">Carregando dados...</p>
+                {loading ? (
+                  <div className="space-y-2 py-2">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="h-14 rounded-xl animate-shimmer" />
+                    ))}
+                  </div>
+                ) : (
+                  <ProfessionalRanking
+                    data={category.data}
+                    categoryKey={category.key}
+                    onSelectProfessional={(professional) => onSelectProfessional(professional, category.key)}
+                    professionalDetails={professionalDetails}
+                    selectedCategory={selectedCategory}
+                    showDetails={showDetails}
+                    onCloseDetails={onCloseDetails}
+                  />
+                )}
               </div>
-            ) : (
-              <ProfessionalRanking
-                data={maquiagemData}
-                onSelectProfessional={(professional) => onSelectProfessional(professional, PROF_CATEGORIES.MAQUIAGEM)}
-                professionalDetails={professionalDetails}
-                selectedCategory={selectedCategory}
-                showDetails={showDetails}
-                onCloseDetails={onCloseDetails}
-              />
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {isCategoryEnabled(PROF_CATEGORIES.ESTETICA) && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{getCategoryDisplayName(PROF_CATEGORIES.ESTETICA)}</CardTitle>
-            <CardDescription>
-              Ranking por percentual de faturamento
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="flex justify-center items-center h-32">
-                <p className="text-gray-500 text-lg">Carregando dados...</p>
-              </div>
-            ) : (
-              <ProfessionalRanking
-                data={esteticaData}
-                onSelectProfessional={(professional) => onSelectProfessional(professional, PROF_CATEGORIES.ESTETICA)}
-                professionalDetails={professionalDetails}
-                selectedCategory={selectedCategory}
-                showDetails={showDetails}
-                onCloseDetails={onCloseDetails}
-              />
-            )}
-          </CardContent>
-        </Card>
-      )}
-    </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
