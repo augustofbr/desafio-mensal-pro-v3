@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProfessionalRanking from "@/components/ProfessionalRanking";
+import ProfessionalModal from "@/components/ProfessionalModal";
 import { getCategoryDisplayName, PROF_CATEGORIES, isCategoryEnabled } from "@/lib/categoryDisplayNames";
 import { BarChart3 } from "lucide-react";
 import { getCurrentMonthName } from "@/lib/utils";
@@ -69,6 +70,7 @@ export default function DataRankings({
   const enabledCategories = categories.filter(c => c.enabled);
 
   return (
+    <>
     <Card className="border-0 shadow-md bg-gradient-to-br from-gray-50/80 via-white to-slate-50/50">
       <CardHeader className="pb-3 px-4">
         <div className="flex items-center gap-2.5">
@@ -107,10 +109,6 @@ export default function DataRankings({
                     data={category.data}
                     categoryKey={category.key}
                     onSelectProfessional={(professional) => onSelectProfessional(professional, category.key)}
-                    professionalDetails={professionalDetails}
-                    selectedCategory={selectedCategory}
-                    showDetails={showDetails}
-                    onCloseDetails={onCloseDetails}
                   />
                 )}
               </div>
@@ -119,5 +117,13 @@ export default function DataRankings({
         </div>
       </CardContent>
     </Card>
+
+    <ProfessionalModal
+      isOpen={showDetails}
+      onClose={onCloseDetails}
+      details={professionalDetails}
+      category={selectedCategory}
+    />
+    </>
   );
 }

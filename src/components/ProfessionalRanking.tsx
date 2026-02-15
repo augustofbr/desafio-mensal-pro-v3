@@ -1,17 +1,12 @@
 
 import { getCurrentMonthName } from "@/lib/utils";
 import { Star, Trophy } from "lucide-react";
-import ProfessionalModal from "./ProfessionalModal";
 import { PROF_CATEGORIES } from "@/lib/categoryDisplayNames";
 
 interface ProfessionalRankingProps {
   data: any[];
   categoryKey: string;
   onSelectProfessional: (professional: string) => void;
-  professionalDetails: any;
-  selectedCategory: string;
-  showDetails: boolean;
-  onCloseDetails: () => void;
 }
 
 const CATEGORY_COLORS: Record<string, {
@@ -60,10 +55,6 @@ export default function ProfessionalRanking({
   data,
   categoryKey,
   onSelectProfessional,
-  professionalDetails,
-  selectedCategory,
-  showDetails,
-  onCloseDetails
 }: ProfessionalRankingProps) {
   const currentMonth = getCurrentMonthName();
   const colors = CATEGORY_COLORS[categoryKey] || CATEGORY_COLORS[PROF_CATEGORIES.CABELO];
@@ -82,8 +73,7 @@ export default function ProfessionalRanking({
   }
 
   return (
-    <>
-      <div className="space-y-2.5">
+    <div className="space-y-2.5">
         {data.map((item, index) => {
           const isFirst = index === 0;
           const score = item.revenuePercentage !== undefined
@@ -114,11 +104,6 @@ export default function ProfessionalRanking({
                 `}>
                   {index + 1}º
                 </div>
-
-                {/* Medal for 1st place */}
-                {isFirst && (
-                  <span className="text-base sm:text-xl shrink-0" role="img" aria-label="medalha de ouro">🥇</span>
-                )}
 
                 {/* Name - grows to fill available space */}
                 <span className={`font-semibold font-body text-xs sm:text-sm truncate min-w-0 flex-1 ${isFirst ? colors.firstNameText : "text-gray-800"}`}>
@@ -175,14 +160,6 @@ export default function ProfessionalRanking({
             </div>
           );
         })}
-      </div>
-
-      <ProfessionalModal
-        isOpen={showDetails}
-        onClose={onCloseDetails}
-        details={professionalDetails}
-        category={selectedCategory}
-      />
-    </>
+    </div>
   );
 }
