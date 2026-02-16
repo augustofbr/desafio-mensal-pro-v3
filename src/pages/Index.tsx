@@ -116,43 +116,39 @@ function DashboardContent() {
             <RegrasDoDesafio />
           </div>
 
-          <div className="grid grid-cols-1 gap-5">
-            <div className="animate-fade-slide-up stagger-6">
-              <DataRankings
+          <div className="animate-fade-slide-up stagger-6">
+            <DataRankings
+              hairData={hairData}
+              manicureData={manicureData}
+              esteticaData={esteticaData}
+              maquiagemData={maquiagemData}
+              loading={loading}
+              onSelectProfessional={handleSelectProfessional}
+              professionalDetails={professionalDetails}
+              selectedCategory={selectedCategory || ""}
+              showDetails={showDetails}
+              onCloseDetails={handleCloseDetails}
+            />
+          </div>
+
+          <div className="animate-fade-slide-up stagger-7 mt-5">
+            {loading ? (
+              <Card className="p-6 border-0 shadow-sm">
+                <div className="flex justify-center items-center h-64">
+                  <div className="text-center">
+                    <div className="w-12 h-12 mx-auto mb-3 rounded-full animate-shimmer" />
+                    <p className="text-gray-500 text-sm font-body">Carregando dados...</p>
+                  </div>
+                </div>
+              </Card>
+            ) : (
+              <DashboardCharts
                 hairData={hairData}
                 manicureData={manicureData}
                 esteticaData={esteticaData}
                 maquiagemData={maquiagemData}
-                loading={loading}
-                onSelectProfessional={handleSelectProfessional}
-                professionalDetails={professionalDetails}
-                selectedCategory={selectedCategory || ""}
-                showDetails={showDetails}
-                onCloseDetails={handleCloseDetails}
               />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-              <div className="lg:col-span-3">
-                {loading ? (
-                  <Card className="p-6 border-0 shadow-sm">
-                    <div className="flex justify-center items-center h-64">
-                      <div className="text-center">
-                        <div className="w-12 h-12 mx-auto mb-3 rounded-full animate-shimmer" />
-                        <p className="text-gray-500 text-sm font-body">Carregando dados...</p>
-                      </div>
-                    </div>
-                  </Card>
-                ) : (
-                  <DashboardCharts
-                    hairData={hairData}
-                    manicureData={manicureData}
-                    esteticaData={esteticaData}
-                    maquiagemData={maquiagemData}
-                  />
-                )}
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
