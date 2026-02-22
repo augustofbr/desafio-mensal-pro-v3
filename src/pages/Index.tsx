@@ -12,8 +12,12 @@ import { DateFilterProvider, useDateFilter } from "@/contexts/DateFilterContext"
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useMonthProgress } from "@/hooks/useMonthProgress";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Cake } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 function DashboardContent() {
+  const navigate = useNavigate();
   const {
     hairData,
     manicureData,
@@ -84,11 +88,23 @@ function DashboardContent() {
             </p>
           </div>
 
-          <div className="animate-fade-slide-up stagger-2">
-            <DateFilter />
+          <div className="flex justify-center mt-3 mb-1 animate-fade-slide-up stagger-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/aniversariantes')}
+              className="gap-2 border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700 font-body"
+            >
+              <Cake className="h-4 w-4" />
+              Aniversariantes
+            </Button>
           </div>
 
           <div className="animate-fade-slide-up stagger-3">
+            <DateFilter />
+          </div>
+
+          <div className="animate-fade-slide-up stagger-4">
             <MonthProgress
               workedDays={workedDays}
               remainingDays={remainingDays}
@@ -102,7 +118,7 @@ function DashboardContent() {
             loading={loading}
           />
 
-          <div className="animate-fade-slide-up stagger-4">
+          <div className="animate-fade-slide-up stagger-5">
             <PremiacaoPanel
               hairData={hairData}
               manicureData={manicureData}
@@ -112,11 +128,11 @@ function DashboardContent() {
             />
           </div>
 
-          <div className="animate-fade-slide-up stagger-5">
+          <div className="animate-fade-slide-up stagger-6">
             <RegrasDoDesafio />
           </div>
 
-          <div className="animate-fade-slide-up stagger-6">
+          <div className="animate-fade-slide-up stagger-7">
             <DataRankings
               hairData={hairData}
               manicureData={manicureData}
@@ -131,7 +147,7 @@ function DashboardContent() {
             />
           </div>
 
-          <div className="animate-fade-slide-up stagger-7 mt-5">
+          <div className="animate-fade-slide-up stagger-8 mt-5">
             {loading ? (
               <Card className="p-6 border-0 shadow-sm">
                 <div className="flex justify-center items-center h-64">
