@@ -188,6 +188,52 @@
   background: linear-gradient(135deg, #8b5cf6, #a78bfa);
 }
 
+/* "Novo" button highlight — shine sweep */
+@keyframes shineSweep {
+  0%, 100% { transform: translateX(-120%) skewX(-15deg); opacity: 0; }
+  10% { opacity: 1; }
+  40% { transform: translateX(220%) skewX(-15deg); opacity: 0; }
+}
+
+.btn-novo-highlight {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-novo-highlight::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.55),
+    transparent
+  );
+  animation: shineSweep 4s ease-in-out 1.5s infinite;
+  pointer-events: none;
+}
+
+/* "Novo" badge — gradient shift + gentle bounce */
+@keyframes novoGradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes novoBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.badge-novo {
+  background: linear-gradient(135deg, #e11d48, #db2777, #f59e0b, #e11d48);
+  background-size: 300% 300%;
+  animation:
+    novoGradient 4s ease-in-out infinite,
+    novoBounce 2s ease-in-out infinite;
+}
+
 /* Subtle glass effect for cards */
 .glass-card {
   backdrop-filter: blur(8px);

@@ -89,15 +89,20 @@ function DashboardContent() {
           </div>
 
           <div className="flex justify-center mt-3 mb-1 animate-fade-slide-up stagger-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/aniversariantes')}
-              className="gap-2 border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700 font-body"
-            >
-              <Cake className="h-4 w-4" />
-              Aniversariantes
-            </Button>
+            <div className="relative">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/aniversariantes')}
+                className="gap-2 border-rose-300 text-rose-600 hover:bg-rose-50 hover:text-rose-700 font-body btn-novo-highlight shadow-sm shadow-rose-100/60"
+              >
+                <Cake className="h-4 w-4" />
+                Aniversariantes
+              </Button>
+              <span className="absolute -top-2.5 -right-4 badge-novo text-[10px] font-body font-bold text-white px-2 py-0.5 rounded-full shadow-sm pointer-events-none">
+                NOVO
+              </span>
+            </div>
           </div>
 
           <div className="animate-fade-slide-up stagger-3">
